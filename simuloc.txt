@@ -1,0 +1,75 @@
+simuloc
+
+interactions strictement locales (avec full asynchronisme)
+en revanche, gros espace d'états
+
+Dans ce qui suit, n = 8
+
+agitation 0.1, cheat 0.001
+avec agitation : pas de vrai point fixe, mais les coups effectués par agitation après avoir trouvé une solution sont très rapidement annulés : on retrouve le "point fixe" très rapidement après avoir déplacé un agent d'une case. 
+succès après quelques millions de coups (un "coup" : mettre à jour la situation d'une paire de cases adjacentes choisie aléatoirement)
+nombre de mouvements d'agents plutôt de l'ordre de quelques centaines ?
+
+
+
+certaines situations "bloquées" pourraient être résolues instantanément en déplaçant un certain agent sur une case sans danger mais distante...
+
+agitation inutile ?
+
+agitation 0, cheat 0.001
+sans agitation, résultats similaires, mais le point fixe en est vraiment un.
+
+
+cheat 0.01
+
+~1,2M coups, 3300 déplacements
+
+22000 coups, 87 déplacements (!)
+
+815k coups, 2301 déplacements
+
+462k coups, 1357 déplacements
+
+690k coups, 1874 déplacements
+
+504k coups, 1384 déplacements
+
+la convergence semble plus rapide.
+
+
+
+cheat 0.1 : pas de succès (arrêts à 10M coups), les mouvements semblent trop aléatoires...
+
+On pourrait envisager d'introduire une probabilité de ne pas réussir à bouger au cas où la transmission de signaux serait trop lente, pour laisser aux agents le temps de voir les conséquences des déplacements précédents : à première vue cela ne semble pas nécessaire.
+
+Essais pour d'autres valeurs de n, avec cheat = 0.01
+
+n = 4 : succès entre 500 et 10k coups
+
+n = 6 : succès entre 10k et 200k coups
+
+n = 12 : pas réussi (arrêt à 23M coups)
+
+n = 10 : quelques succès entre 5M et 10M, mais on va parfois jusqu'à 30M sans trouver de point fixe
+
+n = 9 : fréquemment < 1M coups
+
+
+
+Tentative de permettre aux agents de se déplacer sur des cases dangereuses mais moins que celles de départ : échec (présence de cycles)
+La probabilité optimale de triche semble décroître avec la taille de l'échiquier (pour n = 8, 0.01 donnait les meilleurs résultats, 0.002 semble mieux pour n = 13 à première vue)
+
+
+Il semble mieux de déplacer les reines avant de mettre à jour les signaux : dans le cas contraire, la reine qui se déplace se retrouve automatiquement menacée (en général, avec cheat assez petit, elle devient non menacée avant d'inverser son mouvement, mais on doit quand même gagner des coups).
+Les expériences que j'ai faites après avoir efectué cette modification ne montrent pas de changement qualitatif de comportement.
+
+Le comportement du système semble vraiment différent avec cheat plus élevé (>=0.05) : à creuser ?
+
+
+Changement de la procédure pour choisir les cases à mettre à jour : au lieu de choisir une direction puis une case compatible (pas équiprobable) je choisis d'un coup avec une bijection de [0, (4n-2)(n-1)-1] sur les paires de cases adjacentes.
+
+
+Une paire de cases donnée est choisie toujours dans le même ordre : changer le comportement pour que les déplacements de reine simultanés se fassent de façon indépendante ou donner une chance sur deux d'inverser l'ordre ? J'essaie en rendant indépendants les déplacements de reine simultanés.
+
+
+
