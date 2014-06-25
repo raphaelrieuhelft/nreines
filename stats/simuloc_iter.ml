@@ -1,26 +1,26 @@
-let n = 4
-let m = (4*n-2)*(n-1)
+let n = ref 6
+
 let p_ag = 0.
-let p_cheat = 0.01
+let p_cheat = ref 0.01
 
 let time = ref 0
 let moves = ref 0
 let moved = ref false
 type status = { signals : bool array; mutable agents : int }
 
-let t = Array.make_matrix n n {signals = [||] ; agents = 0}
+let t = Array.make_matrix !n !n {signals = [||] ; agents = 0}
 
 let add_agents i j nb = t.(i).(j).agents <-  nb + t.(i).(j).agents
 
 let init () = 
   Random.self_init ();
-  for i = 0 to n-1 do
-    for j = 0 to n - 1 do
+  for i = 0 to (!n) -1 do
+    for j = 0 to (!n) - 1 do
       t.(i).(j) <- {signals = Array.make 8 false; agents = 0}
     done
   done;
-  for a = 0 to n - 1 do
-    add_agents (Random.int n) (Random.int n) 1
+  for a = 0 to (!n) - 1 do
+    add_agents (Random.int (!n)) (Random.int (!n)) 1
   done
 
 
@@ -82,6 +82,8 @@ let choose_update () =
 *)
 
 let choose_update () = 
+  let n = !n in
+  let m = (4*n-2)*(n-1) in
   let r = Random.int m in
   let a = r/(n-1) and b = r mod (n-1) in
   if a<n then ((b,a),(b+1,a))
@@ -91,6 +93,7 @@ let choose_update () =
 
 
 let attempt_move (i1,j1) (i2,j2) = 
+  let p_cheat = !p_cheat in
   let try_ag = Random.float 1. and try_cheat = Random.float 1. in
   let d = dir (i2, j2) (i1,j1) in
   if ((not (safestay i1 j1)) || (try_ag <= p_ag))
@@ -128,6 +131,7 @@ let update ((i1,j1), (i2,j2))  =
     
     
 let print_board ()= 
+  let n = !n in
   Format.printf "Time %d, moves %d@." !time !moves;
   for i = 0 to n-1 do
     for j = 0 to n - 1 do
@@ -137,6 +141,7 @@ let print_board ()=
   done
     
 let print_safe () =
+  let n = !n in
  Format.printf "Safe spots@.";
   for i = 0 to n -1 do
     for j = 0 to n - 1 do
@@ -146,6 +151,7 @@ let print_safe () =
   done
 
 let solved () = 
+  let n = !n in 
   let rec vert j ind seen = 
     if ind >= n then true
     else match t.(ind).(j).agents with
@@ -198,14 +204,20 @@ let exp () =
 
 let run tot = 
 let rec run i tot acct accm =
-  if ((tot-i)*10 mod tot = 0)||i+1=tot then Format.printf "%d done...@." (tot - i); 
+ (* if ((tot-i)*10 mod tot = 0)||i+1=tot then Format.printf "%d done...@." (tot - i); *)
   if i <= 0 then 
     Format.printf "With size %d, p_cheat %f :  average time %d,
-average number of moves %d over %d runs.@." n p_cheat (acct/tot)
+average number of moves %d over %d runs.@." !n !p_cheat (acct/tot)
       (accm/tot) tot
   else let t,m = exp () in
        run (i-1) tot (acct + t) (accm + m)
 in
 run tot tot 0 0
 
-let () = run 100
+let () = 
+  let l = [0.001; 0.005; 0.008; 0.01; 0.012; 0.015; 0.02] in
+  let rec aux l = 
+    match l with [] -> ()
+    |p::t -> p_cheat:=p; run 50; aux t
+  in
+  aux l
