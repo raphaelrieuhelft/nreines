@@ -115,7 +115,7 @@ La procédure de mise à jour de deux cases adjacentes $(i,j)$  et $(i', j')$
  est la suivante : \begin{itemize} 
 
 
-\item{ Si une reine est présente en case $(i,j)$, alors qu'$(i,j)$ contient un signal, elle est \emph{a priori} menacée : elle envisage alors de se déplacer vers la case $(i',j')$. De même si plusieurs reines sont présentes en $(i,j)$, elles sont menacées et l'une d'elles tente de se déplacer. S'il n'y a pas de signal en $(i',j')$ sauf éventuellement un venant de $(i,j)$ (qui est peut-être dû à la présence de la reine qui cherche à bouger), et qu'il n'y a pas d'autre reine en $(i',j')$, la case est considérée comme sûre et le déplacement a lieu (cf. Figure $2$). Sinon, la case est dangereuse, et le déplacement a lieu seulement avec une probabilité $\varepsilon$.
+\item{ Si une reine est présente en case $(i,j)$, alors que la case $(i,j)$ contient un signal, elle est \emph{a priori} menacée : elle envisage alors de se déplacer vers la case $(i',j')$. De même si plusieurs reines sont présentes en $(i,j)$, elles sont menacées et l'une d'elles tente de se déplacer. S'il n'y a pas de signal en $(i',j')$ sauf éventuellement un venant de $(i,j)$ (qui est peut-être dû à la présence de la reine qui cherche à bouger), et qu'il n'y a pas d'autre reine en $(i',j')$, la case est considérée comme sûre et le déplacement a lieu (cf. Figure $2$). Sinon, la case est dangereuse, et le déplacement a lieu seulement avec une probabilité $\varepsilon$.
 % Si le déplacement réussit, on retire une reine à la case $(i,j)$ et on en ajoute une à la case $(i', j')$. 
 }
 
@@ -273,7 +273,7 @@ Définissons d'abord quelques fonctions auxiliaires :
   \item{On pose $\Ss : {\E\times\La}\to\{0,1\}$ telle que : \[
  \Ss(x,c) =
   \begin{cases} 
-      \hfill 1    \hfill & \text{ si $n_c=0$ et $\forall d \in \D, s_c(d)=0$} \\
+      \hfill 1    \hfill & \text{ si $n_c\leq 1$ et $\forall d \in \D, s_c(d)=0$} \\
       \hfill 0 \hfill & \text{ sinon} \\
   \end{cases}
 \]}
@@ -298,7 +298,7 @@ Définissons d'abord quelques fonctions auxiliaires :
     \M(x, c_{from}, c_{to}) = 
     \begin{cases}
       \hfill 0 \hfill & \text{ si $\Ss(x,c_{from})=1$} \\
-      \hfill 1 \hfill & \text{ si : }{ \begin{cases} \Ss(x,c_{from})=0\\ \text{et } \Sg(x,c_{to}, \delta(c_{from}, c_{to}))=1\\ \end{cases}}\\
+      \hfill 1 \hfill & \text{ si : }{ \begin{cases} \Ss(x,c_{from})=0 \\\text{et $n_{c_{from}}\geq 1$} \\ \text{et } \Sg(x,c_{to}, \delta(c_{from}, c_{to}))=1\\ \end{cases}}\\
       \hfill \mathcal{B}(\varepsilon)\hfill  & \text{ sinon} \\
     \end{cases}
 \]
@@ -334,7 +334,7 @@ s_{x, c}^{c'}(d) =
 \]
 
 \noindent
-On pose alors $\mathcal{F}_{sign} (x, (c_1, c_2) = x'$ avec : \[
+On pose alors $\mathcal{F}_{sign} (x, (c_1, c_2)) = x'$ avec : \[
 \begin{cases}
   \hfill x'_c = x_c  \hfill & \text{ si $c\neq c_1$ et $c\neq c_2$} \\
   \hfill x'_{c_1} = (s_{x, c_1}^{c_2}, n_{x,c_1}) \hfill & \\
@@ -398,7 +398,7 @@ On observe en général un régime transitoire sur les premiers milliers de pas 
     \addlegendentry{Nombre de déplacements}
   \end{axis}
   \end{tikzpicture}
-  \caption{Temps de convergence et nombre de déplacements moyens en fonction de $\varepsilon$ pour $n=8$.}
+  \caption{Temps de convergence moyen et nombre moyen de déplacements en fonction de $\varepsilon$ pour $n=8$.}
 \end{figure}   
 
 La figure $5$ représente la variation du temps de convergence (le nombre de mises à jour avant d'atteindre une solution) et du nombre de déplacements effectifs de reine en fonction de la probabilité $\varepsilon$, dans le cas $n=8$. Les valeurs sont des moyennes sur $100$ échantillons, sauf les deux points extrémaux où l'on s'est restreint à $30$ échantillons pour des raisons de temps de calcul. On observe un optimum de $\varepsilon$ pour ce qui est du temps de convergence, autour de $0.01$, tandis que le nombre de déplacements croît avec $\varepsilon$ sur les valeurs considérées. Un début d'explication à l'existence d'un optimum pour $\varepsilon$ est le fait que sa valeur est un compromis entre le besoin de sortir de situations bloquées (on a besoin de $\varepsilon$ grand) et celui de privilégier les cases sûres pour se diriger vers une solution (il faudrait $\varepsilon$ petit).En effet, plus $\varepsilon$ est grand, plus les reines ont tendance à se déplacer alors que les modifications récentes aux signaux n'ont pas été propagées, donc à se déplacer à partir d'informations erronées.

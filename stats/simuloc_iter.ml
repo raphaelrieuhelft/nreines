@@ -215,9 +215,10 @@ in
 run tot tot 0 0
 
 let () = 
-  let l = [0.001; 0.005; 0.008; 0.01; 0.012; 0.015; 0.02] in
+  let l = [0.001; 0.005; 0.008; 0.009; 0.01; 0.011; 0.012; 0.013;
+  0.014; 0.015; 0.02;0.025; 0.03  ] in
   let rec aux l = 
     match l with [] -> ()
-    |p::t -> p_cheat:=p; run 50; aux t
+    |p::t -> p_cheat:=p; run 500; aux t
   in
   aux l
