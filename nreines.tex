@@ -259,13 +259,13 @@ L'asynchronisme de la mise à jour est utile : si on mettait les cases à jour d
 
 \section*{Formalisation}
 
-On représente l'échiquier par l'ensemble $\La = \cg 0, n-1\cd^2$. On pose $\mathcal{P} = \{0,1\}$ et $\D = \{NW,N,NE,W,E,SW,S,SE\}$ l'ensemble des huit directions. L'état d'une cellule étant déterminé par le nombre de reines présentes et la présence ou l'absence d'un signal en provenance de chaque direction, on note $\mathcal{Q} = (\D \to \mathcal{P})\times\N$ l'ensemble des états. Une \emph{configuration} est un élément de $\E:=\mathcal{Q}^\La$. Pour toute configuration $x$, et toute cellule $c \in \La$, on note $x_c = (s_{x, c}, n_{x, c})$ l'état de la cellule $c$ dans la configuration $x$. La fonction $s_{x, c}$ associe à chaque direction $1$ si $c$ contient un signal en provenance de cette direction et $0$ sinon, et $c$ contient $n_{x, c}$ reines.
+On représente l'échiquier par l'ensemble $\La = \cg 0, n-1\cd^2$. On pose $\mathcal{P} = \{0,1\}$ et $\D = \{NW,N,NE,W,E,SW,S,SE\}$ l'ensemble des huit directions. L'état d'une cellule étant déterminé par le nombre de reines présentes et la présence ou l'absence d'un signal en provenance de chaque direction, on note $\mathcal{Q} = (\D \to \mathcal{P})\times\N$ l'ensemble des états. Une \emph{configuration} est un élément de $\E=\mathcal{Q}^\La$. Pour toute configuration $x$, et toute cellule $c \in \La$, on note $x_c = (s_{x, c}, n_{x, c})$ l'état de la cellule $c$ dans la configuration $x$. La fonction $s_{x, c}$ associe à chaque direction $1$ si $c$ contient un signal en provenance de cette direction et $0$ sinon, et $c$ contient $n_{x, c}$ reines.
 
 On pose $\Ne \subset \La^2$ l'ensemble des paires de cellules adjacentes : $$(c, c') \in \Ne \iff \norm{(c-c')}_\infty = 1$$
 
 On se donne alors $(u_t)_{t\in\N} \in \Ne^\N$ la suite des paires de cellules mises à jour : pour tout $t\in\N$, la paire de cellules mises à jour à l'étape $t$ est $u_t$. On définit de même $(x_t)_{t\in\N}$ la suite des configurations prises par le système au cours du temps.
 
-On cherche à  définir la fonction de mise à jour globale $\mathcal{F} : {\E\times\N}\to\E$ qui à une configuration associe une configuration aléatoire qui lui succède selon la procédure de la partie précédente : $\mathcal{F}(x_t, t) = x_{t+1}$.
+On cherche à  définir la fonction de mise à jour globale $\mathcal{F} : {\E\times\Ne}\to\E$ qui à une configuration associe une configuration aléatoire qui lui succède selon la procédure de la partie précédente : $\mathcal{F}(x_t, u_t) = x_{t+1}$.
 
 Définissons d'abord quelques fonctions auxiliaires :
 
@@ -311,8 +311,8 @@ où $\mathcal{B}(\varepsilon)$ est une variable aléatoire valant $1$ avec une p
 \medskip
 
 \noindent
-On peut maintenant écrire $\mathcal{F}_{move} : \E\times\Ne\to\E$ telle que :  \[
-\mathcal{F}_{move}(x,(c_1, c_2)) = 
+On peut maintenant écrire $\mathcal{F}_{\mathrm{move}} : \E\times\Ne\to\E$ telle que :  \[
+\mathcal{F}_{\mathrm{move}}(x,(c_1, c_2)) = 
 \begin{cases}
   \hfill x_{c_1\to c_2} \hfill & \text{ si $\M(x, c_1, c_2) = 1$ et $\M(x, c_2, c_1) = 0$} \\
   \hfill x_{c_2 \to c_1} \hfill & \text{ si $\M(x, c_1, c_2) = 0$ et $\M(x, c_2, c_1) = 1$} \\
@@ -324,7 +324,7 @@ où $x_{a \to b}$ désigne la configuration obtenue à partir de $x$ en retranch
 \medskip
   
 \noindent 
-Reste à définir une fonction $\mathcal{F}_{sign} : \E\times\Ne\to\E$ de mise à jour des signaux : on pose, pour tout $x\in\E$, $(c,c')\in\Ne$ : \[
+Reste à définir une fonction $\mathcal{F}_{\mathrm{sign}} : \E\times\Ne\to\E$ de mise à jour des signaux : on pose, pour tout $x\in\E$, $(c,c')\in\Ne$ : \[
 s_{x, c}^{c'}(d) = 
 \begin{cases}
   \hfill s_{x, c}(d) \hfill & \text{ si $d \neq \delta(c', c)$} \\
@@ -334,7 +334,7 @@ s_{x, c}^{c'}(d) =
 \]
 
 \noindent
-On pose alors $\mathcal{F}_{sign} (x, (c_1, c_2)) = x'$ avec : \[
+On pose alors $\mathcal{F}_{\mathrm{sign}} (x, (c_1, c_2)) = x'$ avec : \[
 \begin{cases}
   \hfill x'_c = x_c  \hfill & \text{ si $c\neq c_1$ et $c\neq c_2$} \\
   \hfill x'_{c_1} = (s_{x, c_1}^{c_2}, n_{x,c_1}) \hfill & \\
@@ -343,7 +343,7 @@ On pose alors $\mathcal{F}_{sign} (x, (c_1, c_2)) = x'$ avec : \[
 \]
 
 \noindent
-Enfin $\mathcal{F}(x, t) = \mathcal{F}_{sign}(\mathcal{F}_{move}(x, u_t), u_t)$.
+Enfin $\mathcal{F}(x_t, u_tt) = \mathcal{F}_{\mathrm{sign}}(\mathcal{F}_{\mathrm{move}}(x_t, u_t), u_t)$.
 
 \section*{Quelques observations expérimentales}
 
@@ -401,7 +401,7 @@ On observe en général un régime transitoire sur les premiers milliers de pas 
   \caption{Temps de convergence moyen et nombre moyen de déplacements en fonction de $\varepsilon$ pour $n=8$.}
 \end{figure}   
 
-La figure $5$ représente la variation du temps de convergence (le nombre de mises à jour avant d'atteindre une solution) et du nombre de déplacements effectifs de reine en fonction de la probabilité $\varepsilon$, dans le cas $n=8$. Les valeurs sont des moyennes sur $100$ échantillons, sauf les deux points extrémaux où l'on s'est restreint à $30$ échantillons pour des raisons de temps de calcul. On observe un optimum de $\varepsilon$ pour ce qui est du temps de convergence, autour de $0.01$, tandis que le nombre de déplacements croît avec $\varepsilon$ sur les valeurs considérées. Un début d'explication à l'existence d'un optimum pour $\varepsilon$ est le fait que sa valeur est un compromis entre le besoin de sortir de situations bloquées (on a besoin de $\varepsilon$ grand) et celui de privilégier les cases sûres pour se diriger vers une solution (il faudrait $\varepsilon$ petit).En effet, plus $\varepsilon$ est grand, plus les reines ont tendance à se déplacer alors que les modifications récentes aux signaux n'ont pas été propagées, donc à se déplacer à partir d'informations erronées.
+La figure $5$ représente la variation du temps de convergence (le nombre de mises à jour avant d'atteindre une solution) et du nombre de déplacements effectifs de reine en fonction de la probabilité $\varepsilon$, dans le cas $n=8$. Les valeurs sont des moyennes sur $100$ échantillons, sauf les deux points extrémaux où l'on s'est restreint à $30$ échantillons pour des raisons de temps de calcul. On observe un optimum de $\varepsilon$ pour ce qui est du temps de convergence, autour de $0.01$, tandis que le nombre de déplacements croît avec $\varepsilon$ sur les valeurs considérées. Un début d'explication à l'existence d'un optimum pour $\varepsilon$ est le fait que sa valeur est un compromis entre le besoin de sortir de situations bloquées (on a besoin de $\varepsilon$ grand) et celui de privilégier les cases sûres pour se diriger vers une solution (il faudrait $\varepsilon$ petit). En effet, plus $\varepsilon$ est grand, plus les reines ont tendance à se déplacer alors que les modifications récentes aux signaux n'ont pas été propagées, donc à se déplacer à partir d'informations erronées.
 
 \begin{figure}
   \thisfloatpagestyle{empty}
@@ -442,7 +442,7 @@ La figure $5$ représente la variation du temps de convergence (le nombre de mis
   \caption{Temps de convergence pour $\varepsilon=0.01$ et inverse de la densité de solutions en fonction de $n$  (échelle logarithmique).}
 \end{figure}   
 
-La figure $6$ représente l'évolution du temps de convergence en fonction de $n$, dans le cas $\varepsilon=0.01$. Le temps de convergence semble exponentiel en $n$. On a tracé sur la même figure la variation, en fonction de $n$, de $1/d$ où $d$ est la densité des solutions au problème des n reines (quotient du nombre de solutions par le nombre total de positions). On constate que $d$ décroît également exponentiellement, ce qui tend à expliquer la croissance rapide du temps de convergence. L'irrégularité au point $n=6$ s'explique de même par le fait que la variation du nombre de solutions au problème présente la même irrégularité. En effet, il existe $10$ solutions au problème pour $n=5$, mais seulement $4$ pour $n=6$ alors qu'asymptotiquement, le nombre de solutions croît exponentiellement, même si le nombre total de positions croît encore plus rapidement.
+La figure $6$ représente l'évolution du temps de convergence en fonction de $n$, dans le cas $\varepsilon=0.01$. Le temps de convergence semble exponentiel en $n$. On a tracé sur la même figure la variation, en fonction de $n$, de $1/d$ où $d$ est la densité des solutions au problème des n reines (quotient du nombre de solutions par le nombre total de positions). Le nombre de solutions, tabulé par recherche exhaustive, a été tiré de http://www.ic-net.or.jp/home/takaken/e/queen/. On constate que $d$ décroît également exponentiellement, ce qui tend à expliquer la croissance rapide du temps de convergence. L'irrégularité au point $n=6$ s'explique de même par le fait que la variation du nombre de solutions au problème présente la même irrégularité. En effet, il existe $10$ solutions au problème pour $n=5$, mais seulement $4$ pour $n=6$ alors qu'asymptotiquement, le nombre de solutions croît exponentiellement, même si le nombre total de positions croît encore plus rapidement.
 
 Ce modèle ne fait pas de distinction entre les cases dangereuses : on aurait pu envisager, par exemple, de toujours autoriser les déplacements vers des cases portant moins de signaux que la case de départ. Cependant, les minima locaux du nombre de signaux se déplacent alors rapidement, ce qui autorise beaucoup de déplacements de reine et le comportement du système est analogue à celui de notre modèle avec $\varepsilon$ très élevé : la convergence, s'il y en a une, est moins rapide. 
 
