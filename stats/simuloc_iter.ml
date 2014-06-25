@@ -204,7 +204,7 @@ let exp () =
 
 let run tot = 
 let rec run i tot acct accm =
- (* if ((tot-i)*10 mod tot = 0)||i+1=tot then Format.printf "%d done...@." (tot - i); *)
+  if ((tot-i)*5 mod tot = 0)||i+1=tot then Format.printf "%d done...@." (tot - i); 
   if i <= 0 then 
     Format.printf "With size %d, p_cheat %f :  average time %d,
 average number of moves %d over %d runs.@." !n !p_cheat (acct/tot)
@@ -215,7 +215,7 @@ in
 run tot tot 0 0
 
 let () = 
-  let l = [0.001; 0.005; 0.008; 0.009; 0.01; 0.011; 0.012; 0.013;
+  let l = [(*0.001; 0.005; 0.008; 0.009;*) 0.01; 0.011; 0.012; 0.013;
   0.014; 0.015; 0.02;0.025; 0.03  ] in
   let rec aux l = 
     match l with [] -> ()
