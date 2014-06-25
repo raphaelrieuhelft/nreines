@@ -1,4 +1,4 @@
-let n = ref 6
+let n = ref 7
 
 let p_ag = 0.
 let p_cheat = ref 0.01
@@ -215,10 +215,10 @@ in
 run tot tot 0 0
 
 let () = 
-  let l = [(*0.001; 0.005; 0.008; 0.009;*) 0.01; 0.011; 0.012; 0.013;
+  let l = [0.001; 0.005; 0.008; 0.009; 0.01; 0.011; 0.012; 0.013;
   0.014; 0.015; 0.02;0.025; 0.03  ] in
   let rec aux l = 
     match l with [] -> ()
-    |p::t -> p_cheat:=p; run 500; aux t
+    |p::t -> p_cheat:=p; run 300; aux t
   in
   aux l
