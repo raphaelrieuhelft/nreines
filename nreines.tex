@@ -267,6 +267,7 @@ On représente l'échiquier par l'ensemble $\La = \cg 0, n-1\cd^2$. On pose $\ma
 \noindent
 $n_{x,c}$ est le nombre de reines sur la cellule $c$ dans la configuration $x$, et $s_{x,c} = (s_{x,c,N}, s_{x,c,NE}, s_{x,c,E}, \ldots, s_{x,c,NW})$ code la présence ou l'absence de signaux venant de chaque direction : $s_{x,c,d}$ vaut $1$ si dans la configuration $x$, la cellule $c$ contient un signal provenant de la direction $d$, et $0$ sinon.
 
+
 Par souci de lisibilité, on omettra les indices $x$ de configuration partout où on pourra le faire sans ambiguïté et on parlera de l'état $(s_c, n_c)$ d'une cellule $c$.
 %La fonction $s_{x, c}$ associe à chaque direction $1$ si $c$ contient un signal en provenance de cette direction et $0$ sinon, et $c$ contient $n_{x, c}$ reines.
 
@@ -313,6 +314,7 @@ Définissons d'abord quelques fonctions auxiliaires. En toute rigueur, la plupar
     \begin{cases}
       \hfill 0 \hfill & \text{ si $\Ss(c_{\mathrm{from}})=1$} \\
       \hfill 1 \hfill & \text{ si : }{ \begin{cases} \Ss(c_{\mathrm{from}})=0 \\\text{et $n_{c_{\mathrm{from}}}\geq 1$} \\ \text{et } \Sg(c_{\mathrm{to}}, \delta(c_{\mathrm{from}}, c_{\mathrm{to}}))=1\\ \end{cases}}\\
+
       \hfill \mathcal{B}(\varepsilon)\hfill  & \text{ sinon} \\
     \end{cases}
 \]
@@ -432,6 +434,8 @@ La monotonie apparente du nombre de déplacements en fonction de $\varepsilon$ n
 
 %Un début d'explication à l'existence d'un optimum pour $\varepsilon$ est le fait que sa valeur est un compromis entre le besoin de sortir de situations bloquées (on a besoin de $\varepsilon$ grand) et celui de privilégier les cases sûres pour se diriger vers une solution (il faudrait $\varepsilon$ petit). En effet, plus $\varepsilon$ est grand, plus les reines ont tendance à se déplacer alors que les modifications récentes aux signaux n'ont pas été propagées, donc à se déplacer à partir d'informations erronées.
 
+Ce modèle ne fait pas de distinction entre les cases dangereuses : on aurait pu envisager, par exemple, de toujours autoriser les déplacements vers des cases portant moins de signaux que la case de départ. Cependant, les minima locaux du nombre de signaux se déplacent alors rapidement, ce qui autorise beaucoup de déplacements de reine et le comportement du système est analogue à celui de notre modèle avec $\varepsilon$ très élevé : la convergence, s'il y en a une, est moins rapide. 
+
 \subsection*{Temps de convergence en fonction de $\boldsymbol n$}
 
 \begin{figure}
@@ -475,8 +479,6 @@ La monotonie apparente du nombre de déplacements en fonction de $\varepsilon$ n
 
 La figure $6$ représente l'évolution du temps de convergence en fonction de $n$, dans le cas $\varepsilon=0.01$. Le temps de convergence semble exponentiel en $n$. On a tracé sur la même figure la variation, en fonction de $n$, de $1/d$ où $d$ est la densité des solutions au problème des n reines (quotient du nombre de solutions par le nombre total de positions). Le nombre de solutions est une valeur tabulée par recherche exhaustive (OEIS A000170). On constate que $d$ décroît également exponentiellement, ce qui tend à expliquer la croissance rapide du temps de convergence. L'irrégularité au point $n=6$ s'explique de même par le fait que la variation du nombre de solutions au problème présente la même irrégularité. En effet, il existe $10$ solutions au problème pour $n=5$, mais seulement $4$ pour $n=6$ alors qu'asymptotiquement, le nombre de solutions croît exponentiellement, même si le nombre total de positions croît encore plus rapidement.
 
-
-Ce modèle ne fait pas de distinction entre les cases dangereuses : on aurait pu envisager, par exemple, de toujours autoriser les déplacements vers des cases portant moins de signaux que la case de départ. Cependant, les minima locaux du nombre de signaux se déplacent alors rapidement, ce qui autorise beaucoup de déplacements de reine et le comportement du système est analogue à celui de notre modèle avec $\varepsilon$ très élevé : la convergence, s'il y en a une, est moins rapide. 
 
 
 \section*{Lien avec la factorisation}
