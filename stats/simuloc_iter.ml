@@ -3,6 +3,8 @@ let n = ref 8
 let p_ag = 0.
 let p_cheat = ref 0.01
 
+let sample = ref 100
+
 let time = ref 0
 let moves = ref 0
 let moved = ref false
@@ -214,6 +216,7 @@ average number of moves %d over %d runs.@." !n !p_cheat (acct/tot)
 in
 run tot tot 0 0
 
+(*
 let () = 
   let l = [0.001; 0.005; 0.008; 0.009; 0.01; 0.011; 0.012; 0.013;
   0.014; 0.015; 0.02;0.025; 0.03  ] in
@@ -222,3 +225,18 @@ let () =
     |p::t -> p_cheat:=p; run 200; aux t
   in
   aux l
+*)
+
+let options = ["-p", Arg.Float (fun f -> p_cheat := f), "sets p_cheat";
+	       "-n", Arg.Set_int n, "sets board size";
+	       "-sample", Arg.Set_int sample, "sets sample size"]
+
+let () = 
+  Arg.parse options (fun s -> ()) "";
+  for i = 1 to !sample do
+    let (t,m) = exp () in
+    Format.printf "%d@." t;
+  done
+
+  
+  
