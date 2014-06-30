@@ -1,5 +1,5 @@
 let n = ref 8
-
+let nmax = 12
 let p_ag = 0.
 let p_cheat = ref 0.01
 
@@ -10,7 +10,7 @@ let moves = ref 0
 let moved = ref false
 type status = { signals : bool array; mutable agents : int }
 
-let t = Array.make_matrix !n !n {signals = [||] ; agents = 0}
+let t = Array.make_matrix nmax nmax {signals = [||] ; agents = 0}
 
 let add_agents i j nb = t.(i).(j).agents <-  nb + t.(i).(j).agents
 

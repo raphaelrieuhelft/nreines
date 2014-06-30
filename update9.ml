@@ -1,6 +1,6 @@
 let n = ref 8
 let nmax = 12
-let p_ag = 0.
+let p_ag = ref 0.3
 let p_cheat = ref 0.01
 
 let sample = ref 100
@@ -124,19 +124,19 @@ let choose_update () =
 
 let attempt_move (i1,j1) (i2,j2) = 
   let p_cheat = !p_cheat in
-  let try_ag = Random.float 1. and try_cheat = Random.float 1. in
+  let try_cheat = Random.float 1. in
   let d = dir (i2, j2) (i1,j1) in
-  if ((not (safestay i1 j1)) || (try_ag <= p_ag))
+  if (not (safestay i1 j1))
     &&((safego i2 j2 d) || (try_cheat<=p_cheat) (*||(danger i2 j2 d <
 						     danger i1 j1 d) *))
     &&(t.(i1).(j1).agents > 0)&&(t.(i2).(j2).agents = 0)
   then 
     ( moved := true;
-      Format.printf "move from %d,%d to %d,%d at time %d " i1 j1 i2 j2
+     (* Format.printf "move from %d,%d to %d,%d at time %d " i1 j1 i2 j2
 	!time;
       if try_ag <= p_ag then Format.printf "agitated ";
       if try_cheat <= p_cheat then Format.printf "cheated";
-      Format.printf"@.";
+      Format.printf"@.";*)
       incr moves;
       true)
       
@@ -155,7 +155,7 @@ let update (i,j) =
   let min_danger = Cset.fold (fun (i1,j1) m -> let d = danger i1 j1
 						 (dir (i1,j1) (i,j))
 					       in min m d) s max_int in
-  let smin = Cset.filter (fun (i1,j1) -> 
+  let smin = if (Random.float 1.) < !p_ag then s else Cset.filter (fun (i1,j1) -> 
     danger i1 j1 (dir (i1,j1) (i,j)) = min_danger) s in
   let c = Cset.cardinal smin in
   let (i1,j1) = (Array.of_list (Cset.elements smin)).(Random.int c) in
@@ -249,15 +249,15 @@ let exp () =
   while (not !fini) do
     moved := false;
     update (choose_update ());
-    if (!time mod 100000 = 0) then (print_board (); Unix.sleep 1);
+    (*if (!time mod 100000 = 0) then (print_board (); Unix.sleep 1);*)
     incr time;
     if (!time mod 1000 = 0) then fini := (solved ());
     
   done;
-  print_board ();
+ (* print_board ();*)
   !time, !moves
  
-(*
+
 let run tot = 
 let rec run i tot acct accm =
   if ((tot-i)*5 mod tot = 0)||i+1=tot then Format.printf "%d done...@." (tot - i); 
@@ -269,17 +269,18 @@ average number of moves %d over %d runs.@." !n !p_cheat (acct/tot)
        run (i-1) tot (acct + t) (accm + m)
 in
 run tot tot 0 0
-*)
-(*
+
+
 let () = 
-  let l = [0.001; 0.005; 0.008; 0.009; 0.01; 0.011; 0.012; 0.013;
-  0.014; 0.015; 0.02;0.025; 0.03  ] in
+ let l = [(*0.001; 0.005; 0.008; 0.009;*) 0.01;(* 0.011; 0.012; 0.013;
+    0.014;*) 0.015; 0.02;0.025; 0.03  ] in 
+  (* let l = [0.05; 0.075; 0.1; 0.15; 0.2;0.25; 0.3; 0.35] in*)
   let rec aux l = 
     match l with [] -> ()
-    |p::t -> p_cheat:=p; run 200; aux t
+    |p::t -> p_cheat:=p; run 50; aux t
   in
   aux l
-*)
+
 
 let options = ["-p", Arg.Float (fun f -> p_cheat := f), "sets p_cheat";
 	       "-n", Arg.Set_int n, "sets board size";
@@ -294,7 +295,6 @@ let () =
 
 *)
 
-let () = 
-  n:=8;
-  p_cheat:=0.01;
-  ignore (exp())
+
+
+
