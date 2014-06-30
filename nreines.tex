@@ -50,6 +50,11 @@
 \newcommand{\Sg}{\textsc{safego}}
 \newcommand{\M}{\textsc{move}}
 \newcommand{\E}{\mathcal{E}}
+\setlength{\parindent}{0pt}
+
+
+
+
 \begin{document}
 \floatpagestyle{plain}
 \renewcommand{\labelitemi}{$\bullet$}
@@ -104,31 +109,30 @@ On souhaite choisir une paire de cases adjacentes à mettre à jour, avec la mê
 %\item{Les cases à mettre à jour sont la case tirée au sort et sa voisine dans la direction tirée au sort.}
 
 \end{itemize}
-La fonction qui à $N$ associe une paire de cases adjacentes étant bijective, il n'y a pas de biais.
-
+La fonction qui à $N$ associe une paire de cases adjacentes étant bijective, on a bien la même probabilité de choisir chaque paire de cases. 
 
 \bigskip
 
-La procédure de mise à jour de deux cases adjacentes $(i,j)$  et $(i', j')$
+La procédure de mise à jour de deux cases adjacentes $c$  et $c'$
 %, avec $\norm{\begin{pmatrix}i-i'\\j-j'\end{pmatrix}}_\infty=1$,
- %en notant $d_{1\rightarrow 2}$ la direction de $(i,j)$ vers $(i',j')$ et $d_{2\rightarrow 1}$ la direction opposée,
+ %en notant $d_{1\rightarrow 2}$ la direction de $c$ vers $c'$ et $d_{2\rightarrow 1}$ la direction opposée,
  est la suivante : \begin{itemize} 
 
 
-\item{ Si une reine est présente en case $(i,j)$, alors que la case $(i,j)$ contient un signal, elle est \emph{a priori} menacée : elle envisage alors de se déplacer vers la case $(i',j')$. De même si plusieurs reines sont présentes en $(i,j)$, elles sont menacées et l'une d'elles tente de se déplacer. S'il n'y a pas de signal en $(i',j')$ sauf éventuellement un venant de $(i,j)$ (qui est peut-être dû à la présence de la reine qui cherche à bouger), et qu'il n'y a pas d'autre reine en $(i',j')$, la case est considérée comme sûre et le déplacement a lieu (cf. Figure $2$). Sinon, la case est dangereuse, et le déplacement a lieu seulement avec une probabilité $\varepsilon$.
-% Si le déplacement réussit, on retire une reine à la case $(i,j)$ et on en ajoute une à la case $(i', j')$. 
+\item{ Si une reine est présente en case $c$, alors que la case $c$ contient un signal, elle est \emph{a priori} menacée : elle envisage alors de se déplacer vers la case $c'$. De même si plusieurs reines sont présentes en $c$, elles sont menacées et l'une d'elles tente de se déplacer. S'il n'y a pas de signal en $c'$ sauf éventuellement un venant de $c$ (qui est peut-être dû à la présence de la reine qui cherche à bouger), et qu'il n'y a pas d'autre reine en $c'$, la case est considérée comme sûre et le déplacement a lieu (cf. Figure $2$). Sinon, la case est dangereuse, et le déplacement a lieu seulement avec une probabilité $\varepsilon$.
+% Si le déplacement réussit, on retire une reine à la case $c$ et on en ajoute une à la case $(i', j')$. 
 }
 
-\item{ Symétriquement, une reine de $(i',j')$ peut essayer de se déplacer vers $(i,j)$ selon la même procédure. Les deux déplacements se font de manière simultanée afin que l'ordre des deux cases choisies pour la mise à jour n'ait pas d'importance.}
+\item{ Symétriquement, une reine de $c'$ peut essayer de se déplacer vers $c$ selon la même procédure. Les deux déplacements se font de manière simultanée afin que l'ordre des deux cases choisies pour la mise à jour n'ait pas d'importance.}
 
-\item{% Le signal en $(i',j')$ provenant de la direction de $(i,j)$ est modifié de la façon suivante : il devient vrai 
-Un signal en $(i',j')$ provenant de la direction de $(i,j)$ apparaît ou reste présent s'il y a une reine en $(i,j)$, (cf. Figure $2$) ou s'il y a un signal en $(i,j)$ dans la même direction (intuitivement, il y a une reine plus loin dans la direction de $(i,j)$) (cf. Figure $3$). Sinon, rien n'indique plus la présence d'une reine dans cette direction : le signal disparaît s'il était présent (cf. Figure $4$). }
+\item{% Le signal en $c'$ provenant de la direction de $c$ est modifié de la façon suivante : il devient vrai 
+Un signal en $c'$ provenant de la direction de $c$ apparaît ou reste présent s'il y a une reine en $c$, (cf. Figure $2$) ou s'il y a un signal en $c$ dans la même direction (intuitivement, il y a une reine plus loin dans la direction de $c$) (cf. Figure $3$). Sinon, rien n'indique plus la présence d'une reine dans cette direction : le signal disparaît s'il était présent (cf. Figure $4$). }
 
-\item{ Symétriquement, le signal en $(i,j)$ provenant de $(i', j')$ est mis à jour de la même façon.}
+\item{ Symétriquement, le signal en $c$ provenant de $c'$ est mis à jour de la même façon.}
   
-%Le booléen de $x_{i,j}$ correspondant à la direction $d_{2\rightarrow 1}$ devient vrai s'il y a au moins une reine sur la case $(i',j')$ ou si le booléen de $x_{i',j'}$ correspondant à  $d_{2\rightarrow 1}$  est vrai (intuitivement, il y a alors une reine plus loin dans cette direction), et devient faux sinon.
+%Le booléen de $x_{i,j}$ correspondant à la direction $d_{2\rightarrow 1}$ devient vrai s'il y a au moins une reine sur la case $c'$ ou si le booléen de $x_{i',j'}$ correspondant à  $d_{2\rightarrow 1}$  est vrai (intuitivement, il y a alors une reine plus loin dans cette direction), et devient faux sinon.
 
-% Symétriquement, le booléen de $x_{i', j'}$ correspondant à $d_{1\rightarrow 2}$ devient vrai s'il y a une reine en $(i,j)$ ou si le booléen de $x_{i,j}$ correspondant à $d_{1\rightarrow 2}$ est vrai, et devient faux dans le cas contraire.}
+% Symétriquement, le booléen de $x_{i', j'}$ correspondant à $d_{1\rightarrow 2}$ devient vrai s'il y a une reine en $c$ ou si le booléen de $x_{i,j}$ correspondant à $d_{1\rightarrow 2}$ est vrai, et devient faux dans le cas contraire.}
 
 \end{itemize}
 \bigskip
@@ -280,25 +284,26 @@ On cherche à  définir la fonction de mise à jour globale $\mathcal{F} : {\E\t
 
 \subsection*{Mise à jour : les déplacements}
 
-Définissons d'abord quelques fonctions auxiliaires. En toute rigueur, la plupart devraient prendre aussi la configuration en argument : elle est omise pour plus de lisibilité.
+Définissons d'abord quelques fonctions auxiliaires. 
 
  \begin{itemize}
-  \item{On pose $\Ss : {\La}\to\{0,1\}$ telle que : \[
+  \item{On pose $\Ss : {\La}\to\{0,1\}$ qui indique si une reine peut rester sur une case donnée : \[
  \Ss(c) =
   \begin{cases} 
       \hfill 1    \hfill & \text{ si $n_c\leq 1$ et $\forall d \in \D, s_c(d)=0$} \\
       \hfill 0 \hfill & \text{ sinon} \\
   \end{cases}
 \]}
-  \item{On pose $\Sg :  {\La\times\D}\to\{0,1\}$ telle que : \[
+  \item{On pose $\Sg :  {\La\times\D}\to\{0,1\}$ qui indique si une reine peut se déplacer vers une case en venant d'une certaine direction : \[
  \Sg(c, d_{\mathrm {from}}) =
   \begin{cases} 
       \hfill 1    \hfill & \text{ si $n_c=0$ et $\forall d \in \D\setminus\{d_{\mathrm{from}}\}, s_c(d)=0$} \\
       \hfill 0 \hfill & \text{ sinon} \\
   \end{cases}
 \]
+ En toute rigueur, $\Ss$ et $\Sg$ devraient également prendre la configuration en argument : on l'omet pour plus de lisibilité.
 }
-
+\medskip
   \item{On pose $\delta :\Ne\to\D$ telle que $\delta(c_{\mathrm{from}}, c_{\mathrm{to}})$ soit la direction de $c_{\mathrm{from}}$ vue de $c_{\mathrm{to}}$. Plus formellement : \[
  \delta(c_{\mathrm{from}}, c_{\mathrm{to}}) =
   \begin{cases} 
@@ -318,7 +323,7 @@ Définissons d'abord quelques fonctions auxiliaires. En toute rigueur, la plupar
       \hfill \mathcal{B}(\varepsilon)\hfill  & \text{ sinon} \\
     \end{cases}
 \]
-où $\mathcal{B}(\varepsilon)$ est une variable aléatoire valant $1$ avec une probabilité $\varepsilon$ et $0$ avec une probabilité $1-\varepsilon$.
+où $\mathcal{B}(\varepsilon)$ est une variable aléatoire valant $1$ avec une probabilité $\varepsilon$ et $0$ avec une probabilité $1-\varepsilon$. Comme précédemment, on omet de passer la configuration en argument à $\M$ tant qu'il n'y a pas d'ambiguïté.
 }
 
 
@@ -368,7 +373,7 @@ Enfin $\mathcal{F}(x_t, u_t) = \mathcal{F}_{\mathrm{sign}}(\mathcal{F}_{\mathrm{
 \section*{Quelques observations expérimentales}
 
 
-Lancé à partir d'une situation de départ aléatoire (la case de départ de chacune des $n$ reines est choisie selon une loi uniforme de façon indépendante), le système finit par atteindre un point fixe (les états de toutes les cases ne varient plus dans le temps), où chaque reine est sur une case sans signal. La position des reines est alors solution du problème des $n$ reines.
+Lancé à partir d'une situation de départ aléatoire (la case de départ de chacune des $n$ reines est choisie selon une loi uniforme de façon indépendante), on observe que le système finit par atteindre un point fixe où chaque reine est sur une case sans signal. La position des reines est alors solution du problème des $n$ reines.
 
 \subsection*{Comportement qualitatif}
 
@@ -424,17 +429,17 @@ On observe en général un régime transitoire sur les premiers milliers de pas 
   \caption{Temps de convergence moyen et nombre moyen de déplacements en fonction de $\varepsilon$ pour $n=8$.}
 \end{figure}   
 
-Le paramètre $\varepsilon$ a des effets multiples. Plus $\varepsilon$ est grand, plus le système sort rapidement de situations bloquées où aucun déplacement vers une case sûre n'est possible. En revanche, plus il est petit, plus le système épuise les déplacements possibles vers des cases sûres avant qu'une reine se déplace sur une case dangereuse : les déplacements vers des cases sûres sont privilégiés, ce qui empêche notamment de passer à côté d'une solution. En effet, si une solution est accessible sans avoir besoin de déplacer de reine vers une case dangereuse, plus $\varepsilon$ est grand, plus le risque de déplacer une reine vers une case dangereuse et d'avoir peu de chances de trouver rapidement cette solution est important. Enfin, comme il y a typiquement très peu de cases sûres, $\varepsilon$ contrôle également la fréquence des déplacements : plus il est petit, plus les signaux ont de temps pour se propager sur l'échiquier avant le prochain déplacement de reine. Ceci implique que plus $\varepsilon$ est petit, plus les reines se déplacent en se basant sur des informations à jour. 
+Le paramètre $\varepsilon$ a des effets multiples. Plus $\varepsilon$ est grand, plus le système sort rapidement de situations bloquées où aucun déplacement vers une case sûre n'est possible. En revanche, plus il est petit, plus le système a tendance à effectuer tous les déplacements possibles vers des cases sûres avant de déplacer une reine vers une case dangereuse, ce qui peut empêcher de passer à côté d'une solution. En effet, si une solution est accessible sans avoir besoin de déplacer de reine vers une case dangereuse, plus $\varepsilon$ est grand, plus le risque de déplacer une reine vers une case dangereuse et d'avoir peu de chances de trouver rapidement cette solution est important. Enfin, comme il y a typiquement très peu de cases sûres, $\varepsilon$ contrôle également la fréquence des déplacements : plus il est petit, plus les signaux ont de temps pour se propager sur l'échiquier avant le prochain déplacement de reine. Ceci implique que plus $\varepsilon$ est petit, plus les reines se déplacent en se basant sur des informations à jour. 
 
 Le choix de $\varepsilon$ pour minimiser le temps mis par le système pour trouver une solution relève donc d'un compromis entre ces différents effets : on le voudrait petit pour privilégier les déplacements sûrs et déplacer les reines à partir d'informations valides, mais grand pour que les déplacements soient suffisament fréquents.
 
 La figure $5$ représente la variation du temps de convergence (le nombre de mises à jour avant d'atteindre une solution) et du nombre de déplacements effectifs de reine en fonction de la probabilité $\varepsilon$, dans le cas $n=8$. Les valeurs sont des moyennes sur $100$ échantillons, sauf les deux points extrémaux où l'on s'est restreint à $30$ échantillons pour des raisons de temps de calcul. On observe un optimum de $\varepsilon$ pour ce qui est du temps de convergence, autour de $0.01$, tandis que le nombre de déplacements croît avec $\varepsilon$ sur les valeurs considérées. 
 
-La monotonie apparente du nombre de déplacements en fonction de $\varepsilon$ n'est pas étonnante : diminuer $\varepsilon$ revient à augmenter la qualité des déplacements (plus souvent vers des cases sûres, avec des informations plus à jour) quitte à ce qu'ils aient lieu moins fréquemment.
+La monotonie apparente du nombre de déplacements en fonction de $\varepsilon$ n'est pas étonnante : diminuer $\varepsilon$ revient à augmenter la qualité des déplace\-ments (plus souvent vers des cases sûres, avec des informations plus à jour) quitte à ce qu'ils aient lieu moins fréquemment.
 
 %Un début d'explication à l'existence d'un optimum pour $\varepsilon$ est le fait que sa valeur est un compromis entre le besoin de sortir de situations bloquées (on a besoin de $\varepsilon$ grand) et celui de privilégier les cases sûres pour se diriger vers une solution (il faudrait $\varepsilon$ petit). En effet, plus $\varepsilon$ est grand, plus les reines ont tendance à se déplacer alors que les modifications récentes aux signaux n'ont pas été propagées, donc à se déplacer à partir d'informations erronées.
 
-Ce modèle ne fait pas de distinction entre les cases dangereuses : on aurait pu envisager, par exemple, de toujours autoriser les déplacements vers des cases portant moins de signaux que la case de départ. Cependant, les minima locaux du nombre de signaux se déplacent alors rapidement, ce qui autorise beaucoup de déplacements de reine et le comportement du système est analogue à celui de notre modèle avec $\varepsilon$ très élevé : la convergence, s'il y en a une, est moins rapide. 
+Ce modèle ne fait pas de distinction entre les cases dangereuses : on aurait pu envisager, par exemple, de toujours autoriser les déplacements vers des cases portant moins de signaux que la case de départ. Ceci autorise beaucoup de déplacements de reine et le comportement du système est analogue à celui de notre modèle avec $\varepsilon$ très élevé : la convergence, s'il y en a une, est en fait moins rapide. 
 
 \subsection*{Temps de convergence en fonction de $\boldsymbol n$}
 
@@ -477,7 +482,7 @@ Ce modèle ne fait pas de distinction entre les cases dangereuses : on aurait pu
   \caption{Temps de convergence pour $\varepsilon=0.01$ et inverse de la densité de solutions en fonction de $n$  (échelle logarithmique).}
 \end{figure}   
 
-La figure $6$ représente l'évolution du temps de convergence en fonction de $n$, dans le cas $\varepsilon=0.01$. Le temps de convergence semble exponentiel en $n$. On a tracé sur la même figure la variation, en fonction de $n$, de $1/d$ où $d$ est la densité des solutions au problème des n reines (quotient du nombre de solutions par le nombre total de positions). Le nombre de solutions est une valeur tabulée par recherche exhaustive (OEIS A000170). On constate que $d$ décroît également exponentiellement, ce qui tend à expliquer la croissance rapide du temps de convergence. L'irrégularité au point $n=6$ s'explique de même par le fait que la variation du nombre de solutions au problème présente la même irrégularité. En effet, il existe $10$ solutions au problème pour $n=5$, mais seulement $4$ pour $n=6$ alors qu'asymptotiquement, le nombre de solutions croît exponentiellement, même si le nombre total de positions croît encore plus rapidement.
+La figure $6$ représente l'évolution du temps de convergence en fonction de $n$, dans le cas $\varepsilon=0.01$. Le temps de convergence semble exponentiel en $n$. On a tracé sur la même figure la variation, en fonction de $n$, de $1/d$ où $d$ est la densité des solutions au problème des n reines (quotient du nombre de solutions par le nombre total de positions). Le nombre de solutions est une valeur tabulée par recherche exhaustive \footnote{http://jsomers.com/nqueen\_demo/nqueens.html}. On constate que $d$ décroît également exponentiellement, ce qui tend à expliquer la croissance rapide du temps de convergence. L'irrégularité au point $n=6$ s'explique de même par le fait que la variation du nombre de solutions au problème présente la même irrégularité. En effet, il existe $10$ solutions au problème pour $n=5$, mais seulement $4$ pour $n=6$ alors qu'asymptotiquement, le nombre de solutions croît exponentiellement, même si le nombre total de positions croît encore plus rapidement.
 
 
 
