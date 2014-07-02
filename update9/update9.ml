@@ -1,29 +1,53 @@
-let n = 8
-let m = (4*n-2)*(n-1)
-let p_ag = 0.
-let p_cheat = 0.01
+let n = ref 16
+let nmax = 16
+let p_ag = ref 0.3
+let p_cheat = ref 0.03
+
+let sample = ref 100
 
 let time = ref 0
 let moves = ref 0
 let moved = ref false
 type status = { signals : bool array; mutable agents : int }
 
-let t = Array.make_matrix n n {signals = [||] ; agents = 0}
+module Cset = Set.Make(struct type t = (int*int) let compare=compare end) 
+
+let t = Array.make_matrix nmax nmax {signals = [||] ; agents = 0}
+let neigh = Array.make_matrix nmax nmax Cset.empty
 
 let add_agents i j nb = t.(i).(j).agents <-  nb + t.(i).(j).agents
 
+
+
+
+let get_neighbors i j = 
+  let rec aux sx sy acc =
+    if sy = 2 then acc
+    else if sx = 2 
+    then aux (-1) (sy+1) acc
+    else if (sx=0)&&(sy=0) then aux 1 0 acc
+    else let (a,b) = (i+sx, j+sy) in
+	 if (a>=0)&&(a<(!n))&&(b>=0)&&(b<(!n))
+	 then aux (sx+1) sy (Cset.add (a,b) acc)
+	 else aux (sx+1) sy acc
+  in
+  aux (-1) (-1) Cset.empty
+
+
 let init () = 
   Random.self_init ();
-  for i = 0 to n-1 do
-    for j = 0 to n - 1 do
-      t.(i).(j) <- {signals = Array.make 8 false; agents = 0}
+  for i = 0 to (!n) -1 do
+    for j = 0 to (!n) - 1 do
+      t.(i).(j) <- {signals = Array.make 8 false; agents = 0};
+      neigh.(i).(j)<-get_neighbors i j
     done
   done;
-  (*for a = 0 to n - 1 do
-    add_agents (Random.int n) (Random.int n) 1
-  done*)
-  for a = 0 to n-1 do
-    add_agents a a 1
+  let rec place_agent () = 
+    let i,j = (Random.int (!n), Random.int (!n)) in
+    if t.(i).(j).agents = 0 then add_agents i j 1
+    else place_agent () in
+  for a = 0 to (!n) - 1 do
+    place_agent ()
   done
 
 
@@ -61,7 +85,7 @@ let danger i j d =
     if k >=8 then 0 else
      (if (k <> d && t.(i).(j).signals.(k)) then 1 else 0)+(aux (k+1))
   in
-  t.(i).(j).agents+(aux 0)
+  if t.(i).(j).agents > 0 then max_int else aux 0
 
 (*
 let choose_update () = 
@@ -83,36 +107,65 @@ let choose_update () =
   |_ -> let i = 1+ Random.int (n-1) and j = 1 + Random.int (n-1) in
 	((i,j),(i-1,j-1))
 *)
-
+(*
 let choose_update () = 
+  let n = !n in
+  let m = (4*n-2)*(n-1) in
   let r = Random.int m in
   let a = r/(n-1) and b = r mod (n-1) in
   if a<n then ((b,a),(b+1,a))
   else if a < 2*n then ((a-n, b), (a-n, b+1))
   else if a < 3*n -1 then ((a-2*n, b), (a +1 -2*n, b+1))
   else ((a+1-3*n,b+1), (a+2-3*n,b))
+*)
 
+let choose_update () = 
+  (Random.int (!n), Random.int (!n))
 
 let attempt_move (i1,j1) (i2,j2) = 
-  let try_ag = Random.float 1. and try_cheat = Random.float 1. in
+  let p_cheat = !p_cheat in
+  let try_cheat = Random.float 1. in
   let d = dir (i2, j2) (i1,j1) in
-  if ((not (safestay i1 j1)) || (try_ag <= p_ag))
-    &&((safego i2 j2 d) || (try_cheat<=p_cheat))
-    &&(t.(i1).(j1).agents > 0)
+  if (not (safestay i1 j1))
+    &&((safego i2 j2 d) || (try_cheat<=p_cheat) (*||(danger i2 j2 d <
+						     danger i1 j1 d) *))
+    &&(t.(i1).(j1).agents > 0)&&(t.(i2).(j2).agents = 0)
   then 
     ( moved := true;
-      Format.printf "move from %d,%d to %d,%d at time %d " i1 j1 i2 j2
+     (* Format.printf "move from %d,%d to %d,%d at time %d " i1 j1 i2 j2
 	!time;
       if try_ag <= p_ag then Format.printf "agitated ";
       if try_cheat <= p_cheat then Format.printf "cheated";
-      Format.printf"@.";
+      Format.printf"@.";*)
       incr moves;
       true)
       
   else false
-      
-    
+  
 
+
+let update (i,j) = 
+  let s = neigh.(i).(j) in
+  let update_sig (i,j) (i1,j1) = 
+    let d = dir (i,j) (i1,j1) in
+    t.(i).(j).signals.(d) <- (t.(i1).(j1).signals.(d) ||
+				t.(i1).(j1).agents > 0) 
+  in
+  Cset.iter (fun (i1,j1) -> update_sig (i,j) (i1,j1)) s;
+  let min_danger = Cset.fold (fun (i1,j1) m -> let d = danger i1 j1
+						 (dir (i1,j1) (i,j))
+					       in min m d) s max_int in
+  let smin = if (Random.float 1.) < !p_ag then s else Cset.filter (fun (i1,j1) -> 
+    danger i1 j1 (dir (i1,j1) (i,j)) = min_danger) s in
+  let c = Cset.cardinal smin in
+  let (i1,j1) = (Array.of_list (Cset.elements smin)).(Random.int c) in
+  if attempt_move (i,j) (i1,j1)
+    then (add_agents i j (-1); add_agents i1 j1 1)
+
+ (* if !moved then Cset.iter (fun (i1,j1) -> update_sig (i,j) (i1,j1)) s*)
+    
+    
+(*
 let update ((i1,j1), (i2,j2))  =
   let d = dir (i1,j1) (i2,j2) in
   begin match ( attempt_move (i1,j1) (i2,j2), attempt_move (i2,j2) (i1,j1))
@@ -128,9 +181,10 @@ let update ((i1,j1), (i2,j2))  =
   t.(i2).(j2).signals.(7-d) <- (t.(i1).(j1).signals.(7-d) ||
 				  (t.(i1).(j1).agents > 0))
     
-    
+*)  
     
 let print_board ()= 
+  let n = !n in
   Format.printf "Time %d, moves %d@." !time !moves;
   for i = 0 to n-1 do
     for j = 0 to n - 1 do
@@ -138,8 +192,11 @@ let print_board ()=
     done;
     Format.printf "@."
   done
+
+
     
 let print_safe () =
+  let n = !n in
  Format.printf "Safe spots@.";
   for i = 0 to n -1 do
     for j = 0 to n - 1 do
@@ -149,6 +206,7 @@ let print_safe () =
   done
 
 let solved () = 
+  let n = !n in 
   let rec vert j ind seen = 
     if ind >= n then true
     else match t.(ind).(j).agents with
@@ -183,8 +241,9 @@ let solved () =
   done;
   !rep
 
-let () = 
+let exp () = 
   time := 0;
+  moves := 0;
   init ();
   let fini = ref false in
   while (not !fini) do
@@ -192,7 +251,52 @@ let () =
     update (choose_update ());
     if (!time mod 1000000 = 0) then (print_board (); Unix.sleep 1);
     incr time;
-    if !moved then fini := (solved ());
+    if (!time mod 1000 = 0) then fini := (solved ());
     
   done;
-  print_board ()
+  print_board ();
+  !time, !moves
+ 
+
+let run tot = 
+let rec run i tot acct accm =
+  if ((tot-i)*5 mod tot = 0)||i+1=tot then Format.printf "%d done...@." (tot - i); 
+  if i <= 0 then 
+    Format.printf "With size %d, p_cheat %f :  average time %d,
+average number of moves %d over %d runs.@." !n !p_cheat (acct/tot)
+      (accm/tot) tot
+  else let t,m = exp () in
+       run (i-1) tot (acct + t) (accm + m)
+in
+run tot tot 0 0
+
+(*
+let () = 
+ let l = [(*0.001; 0.005; 0.008; 0.009;*) 0.01;(* 0.011; 0.012; 0.013;
+    0.014;*) 0.015; 0.02;0.025; 0.03  ] in 
+  (* let l = [0.05; 0.075; 0.1; 0.15; 0.2;0.25; 0.3; 0.35] in*)
+  let rec aux l = 
+    match l with [] -> ()
+    |p::t -> p_cheat:=p; run 50; aux t
+  in
+  aux l
+*)
+
+let _ = exp ()
+
+let options = ["-p", Arg.Float (fun f -> p_cheat := f), "sets p_cheat";
+	       "-n", Arg.Set_int n, "sets board size";
+	       "-sample", Arg.Set_int sample, "sets sample size"]
+(*
+let () = 
+  Arg.parse options (fun s -> ()) "";
+  for i = 1 to !sample do
+    let (t,m) = exp () in
+    Format.printf "%d@." t;
+  done
+
+*)
+
+
+
+

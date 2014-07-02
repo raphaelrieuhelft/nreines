@@ -58,7 +58,7 @@
 \begin{document}
 \floatpagestyle{plain}
 \renewcommand{\labelitemi}{$\bullet$}
-\title{Le problème des $\boldsymbol n$ reines}
+\title{Le problème des $ n$ reines}
 \date{}
 \author{}
 \maketitle
@@ -134,13 +134,17 @@ La fonction qui à $N$ associe une paire de cases adjacentes étant bijective, o
 
 \subsection*{Mise à jour : les déplacements}
 
-On se donne deux cases adjacentes $c$ et $c'$ à mettre à jour. On commence par envisager des déplacements de reine entre $c$ et $c'$ de la façon suivante :  
+On se donne deux cases adjacentes $c$ et $c'$ à mettre à jour. On commence par envisager des déplacements de reine entre $c$ et $c'$. Le principe général est qu'une reine menacée essaie de quitter sa case lorsqu'elle est mise à jour. Ce déplacement réussit ou non en fonction de l'état de l'autre case mise à jour, avec une part d'aléatoire. La procédure est la suivante :
+
 \begin{itemize}
-\item{ Si une reine est présente en case $c$, alors que la case $c$ contient un signal, elle est \emph{a priori} menacée : elle envisage alors de se déplacer vers la case $c'$. De même, si plusieurs reines sont présentes en $c$, elles sont menacées et l'une d'elles tente de se déplacer. S'il n'y a pas de signal en $c'$ sauf éventuellement un venant de $c$ (qui est peut-être dû à la présence de la reine qui cherche à bouger), et qu'il n'y a pas d'autre reine en $c'$, la case est considérée comme sûre et le déplacement a lieu (cf. Figure $2$). Sinon, la case est dangereuse, et le déplacement a lieu seulement avec une probabilité $\varepsilon$.
+
+\item{ Si une reine est présente en case $c$, alors que la case $c$ contient un signal, elle essaie de se déplacer vers la case $c'$. De même, si plusieurs reines sont présentes en $c$, elles sont menacées et l'une d'entre elles tente de se déplacer vers la case $c'$.}
+
+\item{ S'il n'y a pas de signal en $c'$ sauf éventuellement un venant de $c$ (qui est peut-être dû à la présence de la reine qui cherche à bouger), et qu'il n'y a pas d'autre reine en $c'$, la case est considérée comme sûre et le déplacement a lieu (cf. Figure $2$). Sinon, la case est dangereuse, et le déplacement a lieu seulement avec une probabilité $\varepsilon$.
 % Si le déplacement réussit, on retire une reine à la case $c$ et on en ajoute une à la case $(i', j')$. 
 }
 
-\item{ Symétriquement, une reine de $c'$ peut essayer de se déplacer vers $c$ selon la même procédure. Les deux déplacements se font de manière simultanée afin que l'ordre des deux cases choisies pour la mise à jour n'ait pas d'importance.}
+\item{ Symétriquement, une reine de $c'$ peut se déplacer vers $c$ selon la même procédure. Les deux déplacements se font de manière simultanée afin que l'ordre des deux cases choisies pour la mise à jour n'ait pas d'importance.}
 
 \end{itemize}
 \medskip
@@ -162,7 +166,7 @@ Formalisons cette procédure à l'aide de quelques fonctions auxiliaires :
       \hfill 0 \hfill & \text{ sinon} \\
   \end{cases}
 \]
- En toute rigueur, $\Ss$ et $\Sg$ devraient également prendre la configuration en argument : on l'omet pour plus de lisibilité.
+ En toute rigueur, $\Ss$ et $\Sg$ devraient prendre aussi la configuration en argument : on l'omet pour plus de lisibilité.
 }
 \medskip
   \item{On pose $\delta :\Ne\to\D$ telle que $\delta(c_{\mathrm{from}}, c_{\mathrm{to}})$ soit la direction de $c_{\mathrm{from}}$ vue de $c_{\mathrm{to}}$. Plus formellement : \[
@@ -208,7 +212,7 @@ où $x_{a \to b}$ désigne la configuration obtenue à partir de $x$ en retranch
 
 \subsection*{Mise à jour : les signaux}  
 
-Après avoir effectué d'éventuels déplacements de reine, on met à jour les signaux de $c$ et $c'$ de la façon suivante :
+Après avoir effectué d'éventuels déplacements de reine, on met à jour les signaux de $c$ et $c'$. 
 
  \begin{itemize} 
 
@@ -216,6 +220,8 @@ Après avoir effectué d'éventuels déplacements de reine, on met à jour les s
 Un signal en $c'$ provenant de la direction de $c$ apparaît ou reste présent s'il y a une reine en $c$, (cf. Figure $2$) ou s'il y a un signal en $c$ dans la même direction (intuitivement, il y a une reine plus loin dans la direction de $c$) (cf. Figure $3$). Sinon, rien n'indique plus la présence d'une reine dans cette direction : le signal disparaît s'il était présent (cf. Figure $4$). }
 
 \item{ Symétriquement, le signal en $c$ provenant de $c'$ est mis à jour de la même façon.}
+
+\item{ Les autres signaux ne sont pas modifiés. }
   
 %Le booléen de $x_{i,j}$ correspondant à la direction $d_{2\rightarrow 1}$ devient vrai s'il y a au moins une reine sur la case $c'$ ou si le booléen de $x_{i',j'}$ correspondant à  $d_{2\rightarrow 1}$  est vrai (intuitivement, il y a alors une reine plus loin dans cette direction), et devient faux sinon.
 
@@ -428,7 +434,10 @@ La figure $6$ représente l'évolution du temps de convergence en fonction de $n
         anchor=north}]
     \addplot[color=red, mark = *] coordinates {%(0.0005, 4186672) 
 (0.001, 1677950) 
-      (0.005, 508333)(0.008, 414684) (0.01, 372401) (0.012, 418484) (0.015, 477431)  (0.02, 672129)    %(0.03, 1324725)
+      (0.005, 508333)%(0.008, 414684) 
+      (0.01, 372401) 
+      %(0.012, 418484)
+      (0.015, 477431)  (0.02, 672129)    %(0.03, 1324725)
     }; 
     \addlegendentry{Temps de convergence}
         
@@ -450,7 +459,11 @@ La figure $6$ représente l'évolution du temps de convergence en fonction de $n
       ylabel near ticks]
     \addplot[color=blue, mark = triangle*] coordinates {% (0.0005, 499) 
 (0.001, 403)
-      (0.005, 641)(0.008, 883) (0.01, 996) (0.012, 1368)(0.015, 1997)(0.02, 3731)% (0.03, 10998)
+      (0.005, 641)
+      %(0.008, 883)
+      (0.01, 996)
+      %(0.012, 1368)
+      (0.015, 1997)(0.02, 3731)% (0.03, 10998)
     };
     \addlegendentry{Nombre de déplacements}
   \end{axis}
