@@ -1,9 +1,13 @@
+open Unix
+
 let n = ref 16
 let nmax = 16
 let p_ag = ref 0.3
 let p_cheat = ref 0.03
 
 let sample = ref 100
+
+let ff = ref Format.std_formatter
 
 let time = ref 0
 let moves = ref 0
@@ -129,7 +133,7 @@ let attempt_move (i1,j1) (i2,j2) =
   if (not (safestay i1 j1))
     &&((safego i2 j2 d) || (try_cheat<=p_cheat) (*||(danger i2 j2 d <
 						     danger i1 j1 d) *))
-    &&(t.(i1).(j1).agents > 0)&&(t.(i2).(j2).agents = 0)
+    &&(t.(i1).(j1).agents > 0)(*&&(t.(i2).(j2).agents = 0)*)
   then 
     ( moved := true;
      (* Format.printf "move from %d,%d to %d,%d at time %d " i1 j1 i2 j2
@@ -249,13 +253,14 @@ let exp () =
   while (not !fini) do
     moved := false;
     update (choose_update ());
-    if (!time mod 1000000 = 0) then (print_board (); Unix.sleep 1);
+    (*if (!time mod 1000000 = 0) then (print_board (); Unix.sleep 1);*)
     incr time;
     if (!time mod 1000 = 0) then fini := (solved ());
     
   done;
-  print_board ();
+  (*print_board ();*)
   !time, !moves
+  
  
 
 let run tot = 
@@ -266,6 +271,7 @@ let rec run i tot acct accm =
 average number of moves %d over %d runs.@." !n !p_cheat (acct/tot)
       (accm/tot) tot
   else let t,m = exp () in
+       (*Format.fprintf !ff "%d, %d" !times !moves;*)
        run (i-1) tot (acct + t) (accm + m)
 in
 run tot tot 0 0
@@ -282,7 +288,7 @@ let () =
   aux l
 *)
 
-let _ = exp ()
+(*let _ = exp ()*)
 
 let options = ["-p", Arg.Float (fun f -> p_cheat := f), "sets p_cheat";
 	       "-n", Arg.Set_int n, "sets board size";
@@ -290,12 +296,21 @@ let options = ["-p", Arg.Float (fun f -> p_cheat := f), "sets p_cheat";
 (*
 let () = 
   Arg.parse options (fun s -> ()) "";
-  for i = 1 to !sample do
-    let (t,m) = exp () in
-    Format.printf "%d@." t;
+  for s = 4 to 9 do
+    n:=s;
+    let fd = Unix.openfile (string_of_int s) [O_WRONLY; O_CREAT] 0o640
+  in
+    ff:=Format.formatter_of_out_channel (out_channel_of_descr fd);
+    for i = 1 to !sample do
+      let (t,m) = exp () in
+      Format.fprintf !ff "%d, %d@." t m;
+    done
   done
-
 *)
+
+let _ = n:=8; run 100
+
+
 
 
 

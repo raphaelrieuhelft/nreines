@@ -50,6 +50,7 @@
 \newcommand{\Sg}{\textsc{safego}}
 \newcommand{\M}{\textsc{move}}
 \newcommand{\E}{\mathcal{E}}
+\newcommand{\V}{\mathcal V}
 \setlength{\parindent}{0pt}
 
 
@@ -510,9 +511,73 @@ La figure $6$ représente l'évolution du temps de convergence en fonction de $n
   \caption{Temps de convergence pour $\varepsilon=0.01$ et inverse de la densité de solutions en fonction de $n$  (échelle logarithmique).}
 \end{figure} 
 
+
+\section*{Un autre algorithme}
+
+Le modèle précédent ne passe pas très bien à l'échelle : obtenir une solution pour des tailles supérieures à $12$ peut s'avérer très long. On va donc envisager un nouveau modèle dans lequel plus d'informations sont prises en compte à chaque étape de calcul. L'objectif est que l'évolution du système soit plus dirigée que précédemment, tout en se restreignant encore à des règles de mise à jour locales. Plutôt que de choisir une paire de cases à chaque pas de temps et ne considérer que les informations contenues dans ces deux cases, on va mettre à jour une case par pas de temps, en utilisant les informations de toutes ses voisines. 
+
+On utilise le même système de signaux que dans l'algorithme précédent et on garde le même espace d'états : $\mathcal{Q} = {\mathcal{P}^8}\times\N$. On pose, pour tout $c\in\La$, $\V_c\subset\La$ l'ensemble des cellules voisines de $c$ : $\V_c = \{c' \in \La, \norm{(c-c')}_\infty = 1\}$.
+À chaque pas de temps, on choisit une case au hasard, on met à jour ses signaux par rapport à ceux des cellules voisines, et une reine quitte éventuellement la case. 
+
+%On se donne $(u_t)_{t\in\N} \in \La^\N$ la suite des cellules mises à jour, et $(x_t)$ la suite des configurations, et on va définir $\mathcal{F'} : \E\times\La\to\E$ telle que $\mathcal{F'}(x_t,u_t) = x_{t+1}$.
+
+\bigskip
+
+Contrairement à l'algorithme précédent, comme les signaux d'une seule case sont modifiés à chaque pas de temps, on les met à jour avant d'envisager un déplacement de reine. On met à jour les signaux d'une cellule $c$ par rapport à chacune de ses voisines, de la même façon que dans le modèle précédent : pour toute cellule $c'\in\V_c$, le signal en $c$ provenant de $c'$ apparaît ou reste présent s'il y en a un en $c'$ provenant de la même direction, ou s'il y a une reine en $c'$. Dans le cas contraire, il disparaît ou n'apparaît pas.
+\bigskip
+
+L'idée de la procédure pour déplacer une reine est la suivante : si on met à jour une case $c$ contenant des reines menacées, une reine choisit une case de $\V_c$, et tente de s'y déplacer selon la même procédure que dans l'algorithme précédent. 
+
+On définit $\omega : \La\to\N\cup\{\infty\}$ qui sert à quantifier à quel point une cellule est dangereuse, de la façon suivante : \[
+\omega(c) = 
+\begin{cases}
+  \hfill \infty \hfill \text{ si $n_c > 0$}\\
+  \hfill \sum\limits_{d\in\D}s_{c,d} \hfill \text{ sinon}
+\end{cases}
+\]
+
+On aimerait toujours envoyer une reine menacée de $c$ vers une cellule de $V_c$ qui minimise $\omega$, mais il existe des positions pour lesquelles un tel choix déterministe crée des cycles. 
+
+% TODO : figure
+
+On se donne donc une probabilité $\eta \in [0,1]$, et on choisit avec une probabilité $\eta$ une case aléatoire de $V_c$ comme destination, et avec une probabilité $1 - \eta$ une case aléatoire parmi les éléments de $V_c$ qui minimisent $\omega$.
+
+Une fois la destination choisie, la procédure qui décide si le déplacement se fait ou non est exactement la fonction $\M$ de l'algorithme précédent.
+
+\bigskip
+
+\begin{figure}/
+  \centering
+  \begin{tikzpicture}
+  \begin{axis}[%
+      width=\textwidth,
+      ymode=log,
+      scaled y ticks=false,
+      scaled x ticks=false,
+      xlabel={$n$},
+      ylabel={Temps de convergence}]
+    \addplot[color=red, mark = *] coordinates {
+      %(4, 2730) (5, 6280) (6, 89530) 
+      (7, 110190) (8, 372401) (9, 865766) (10, 5005116) 
+      (11, 14883900) 
+      (12, 73200000)
+    }; 
+    \addplot[color=blue, mark = triangle*] coordinates {
+      %(4, 837) (5, 1590) (6,2.78e4) 
+      (7, 2.49e4) (8, 9.63e4) (9, 1.91e5) (10, 4.74e5) (11, 9.44e5) (12, 1.78e6)
+    };
+    %\addlegendentry{Temps de convergence}
+        
+  \end{axis}
+  \end{tikzpicture}
+  \caption{Temps de convergence moyen en fonction de $n$.}
+\end{figure}  
+
+La figure $7$ montre que ce nouvel algorithme passe un peu mieux à l'échelle que précédemment : la pente de la courbe qui représente le temps de convergence moyen en fonction de $n$ est plus basse pour le nouvel algorithme que pour l'ancien. De fait, il permet de trouver en un temps raisonnable (quelques minutes sur une machine individuelle) des solutions jusqu'à $n=16$, contre $12$ pour le modèle précédent, alors que les temps de calcul sont très similaires pour $n=8$.
+
 \section*{Lien avec la factorisation}
 
-Dans le cadre du problème de la factorisation, les problèmes liés à la propagation de contraintes peuvent se traduire de manière assez analogue aux signaux transmis par les cellules de ce modèle. En effet, les termes de l'addition binaire doivent respecter une contrainte globale : les lignes non-nulles sont toutes égales (à la translation due à la retenue près) : si on pose la multiplication binaire de $a$ par $b$, on somme des copies de $a$, décalées de $i$ crans vers la gauche pour tout $i\in I$ tel que $b = \sum_{i\in I}2^i$ (cf. Figure $7$) . Ceci peut se traduire de la façon suivante : une cellule sur la même ligne qu'un 1 (la ligne est non nulle) et sur la même diagonale qu'un 1 doit contenir elle-même un 1. On peut donc envisager de transmettre des signaux sur les lignes et les diagonales pour détecter la présence de 1 avec des règles purement locales. 
+Dans le cadre du problème de la factorisation, les problèmes liés à la propagation de contraintes peuvent se traduire de manière assez analogue aux signaux transmis par les cellules de ce modèle. En effet, les termes de l'addition binaire doivent respecter une contrainte globale : les lignes non-nulles sont toutes égales (à la translation due à la retenue près) : si on pose la multiplication binaire de $a$ par $b$, on somme des copies de $a$, décalées de $i$ crans vers la gauche pour tout $i\in I$ tel que $b = \sum_{i\in I}2^i$ (cf. Figure $8$) . Ceci peut se traduire de la façon suivante : une cellule sur la même ligne qu'un 1 (la ligne est non nulle) et sur la même diagonale qu'un 1 doit contenir elle-même un 1. On peut donc envisager de transmettre des signaux sur les lignes et les diagonales pour détecter la présence de 1 avec des règles purement locales. 
 
 \begin{figure}
 \centering
