@@ -1,5 +1,5 @@
 \documentclass[11pt, openany]{article}
-%\usepackage{pstricks,pstricks-add,pst-math,pst-xkey}
+\usepackage{pstricks,pstricks-add,pst-math,pst-xkey}
 \usepackage[frenchb]{babel}
 %\usepackage{slashbox}
 \usepackage{graphicx}
@@ -12,7 +12,8 @@
 \usepackage{floatpag}
 \usepgfmodule{shapes}
 \usetikzlibrary{arrows,patterns}
-\usepackage{skak}
+\usepackage[ps]{skak}
+\usepackage{chessboard}
 \newcounter{moncompteur}
 \newtheorem{q}[moncompteur]{ \textbf{Question}}{}
 \newtheorem{prop}[moncompteur]{ \textbf{Proposition}}{}
@@ -526,7 +527,7 @@ On utilise le même système de signaux que dans l'algorithme précédent et on 
 Contrairement à l'algorithme précédent, comme les signaux d'une seule case sont modifiés à chaque pas de temps, on les met à jour avant d'envisager un déplacement de reine. On met à jour les signaux d'une cellule $c$ par rapport à chacune de ses voisines, de la même façon que dans le modèle précédent : pour toute cellule $c'\in\V_c$, le signal en $c$ provenant de $c'$ apparaît ou reste présent s'il y en a un en $c'$ provenant de la même direction, ou s'il y a une reine en $c'$. Dans le cas contraire, il disparaît ou n'apparaît pas.
 \bigskip
 
-L'idée de la procédure pour déplacer une reine est la suivante : si on met à jour une case $c$ contenant des reines menacées, une reine choisit une case de $\V_c$, et tente de s'y déplacer selon la même procédure que dans l'algorithme précédent. 
+L'idée de la procédure pour déplacer une reine est la suivante : si on met à jour une case $c$ contenant des reines menacées, l'une d'entre elles choisit une case de $\V_c$, et tente de s'y déplacer selon la même procédure que dans l'algorithme précédent. 
 
 On définit $\omega : \La\to\N\cup\{\infty\}$ qui sert à quantifier à quel point une cellule est dangereuse, de la façon suivante : \[
 \omega(c) = 
@@ -536,17 +537,33 @@ On définit $\omega : \La\to\N\cup\{\infty\}$ qui sert à quantifier à quel poi
 \end{cases}
 \]
 
-On aimerait toujours envoyer une reine menacée de $c$ vers une cellule de $V_c$ qui minimise $\omega$, mais il existe des positions pour lesquelles un tel choix déterministe crée des cycles. 
+On aimerait toujours envoyer une reine menacée de $c$ vers une cellule de $V_c$ qui minimise $\omega$, mais il existe des positions pour lesquelles un tel choix déterministe ne permet pas de résoudre le problème. Ainsi, la position de la figure $7$, avec les signaux convenablement propagés (ie. une case porte un signal venant d'une certaine direction si et seulement si il y a effectivement une reine dans cette direction), est une position insoluble. En effet, en partant de cette position, on aura à chaque instant les reines des colonnes \textbf c à \textbf f sur leur case initiale, et les deux autres dans le triangle de cases colorées en rouge, ce qui ne peut constituer une solution. 
+Lorsqu'elles bougent, les deux reines du triangle rouge restent dedans : à chaque instant, la case rouge inoccupée vérifie $\omega = 2$, contre $3$ ou $4$ pour les cases adjacentes au triangle rouge. Quelque soit la position des deux reines dans le triangle rouge, les autres reines ne sont pas menacées : à chaque instant, le prochain mouvement est donc celui d'une des deux reines du triangle rouge, et elle reste dans ce triangle.
+
 
 % TODO : figure
 
-On se donne donc une probabilité $\eta \in [0,1]$, et on choisit avec une probabilité $\eta$ une case aléatoire de $V_c$ comme destination, et avec une probabilité $1 - \eta$ une case aléatoire parmi les éléments de $V_c$ qui minimisent $\omega$.
+\begin{figure}[scale=0.85]
+\centering
+%\newchessgame
+\chessboard[maxfield=f6,
+  setpieces={qa3,qb3,qc6,qd4,qe1,qf5},pgf=true,captrimtoprint=true,psset=true, psskak=true,
+color=red!50,
+colorbackfields={a2,a3,b3}]
+
+%\chessboard[maxfield=f6, setpieces={qa3,qb3,qc6,qd4,qe1,qf5}]
+\caption{Exemple de position insoluble avec $\eta=0$.}
+\end{figure}
+
+\medskip
+
+On veut donc que le choix de la destination ne soit pas toujours la case adhacente qui minimise $\omega$. On se donne donc une probabilité $\eta \in [0,1]$, et on choisit avec une probabilité $\eta$ une case aléatoire de $V_c$ comme destination, et avec une probabilité $1 - \eta$ une case aléatoire parmi les éléments de $V_c$ qui minimisent $\omega$. Ainsi, la position de la figure $7$ ne pose pas de problème pour $\eta > 0$ : une reine va sortir du triangle rouge et faire se déplacer une des autres reines.
 
 Une fois la destination choisie, la procédure qui décide si le déplacement se fait ou non est exactement la fonction $\M$ de l'algorithme précédent.
 
 \bigskip
 
-\begin{figure}/
+\begin{figure}
   \centering
   \begin{tikzpicture}
   \begin{axis}[%
@@ -555,7 +572,9 @@ Une fois la destination choisie, la procédure qui décide si le déplacement se
       scaled y ticks=false,
       scaled x ticks=false,
       xlabel={$n$},
-      ylabel={Temps de convergence}]
+      ylabel={Temps de convergence},
+      legend entries = {Algorithme 1, Algorithme 2},
+      legend style = {legend pos=north west}]
     \addplot[color=red, mark = *] coordinates {
       %(4, 2730) (5, 6280) (6, 89530) 
       (7, 110190) (8, 372401) (9, 865766) (10, 5005116) 
@@ -573,11 +592,13 @@ Une fois la destination choisie, la procédure qui décide si le déplacement se
   \caption{Temps de convergence moyen en fonction de $n$.}
 \end{figure}  
 
-La figure $7$ montre que ce nouvel algorithme passe un peu mieux à l'échelle que précédemment : la pente de la courbe qui représente le temps de convergence moyen en fonction de $n$ est plus basse pour le nouvel algorithme que pour l'ancien. De fait, il permet de trouver en un temps raisonnable (quelques minutes sur une machine individuelle) des solutions jusqu'à $n=16$, contre $12$ pour le modèle précédent, alors que les temps de calcul sont très similaires pour $n=8$.
+La figure $8$ montre que ce nouvel algorithme passe un peu mieux à l'échelle que précédemment : la pente de la courbe qui représente le temps de convergence moyen en fonction de $n$ est plus basse pour le nouvel algorithme que pour l'ancien. De fait, il permet de trouver en un temps raisonnable (quelques minutes sur une machine individuelle) des solutions jusqu'à $n=16$, contre $12$ pour le modèle précédent, alors que les temps de calcul sont très similaires pour $n=8$.
+
+\clearpage
 
 \section*{Lien avec la factorisation}
 
-Dans le cadre du problème de la factorisation, les problèmes liés à la propagation de contraintes peuvent se traduire de manière assez analogue aux signaux transmis par les cellules de ce modèle. En effet, les termes de l'addition binaire doivent respecter une contrainte globale : les lignes non-nulles sont toutes égales (à la translation due à la retenue près) : si on pose la multiplication binaire de $a$ par $b$, on somme des copies de $a$, décalées de $i$ crans vers la gauche pour tout $i\in I$ tel que $b = \sum_{i\in I}2^i$ (cf. Figure $8$) . Ceci peut se traduire de la façon suivante : une cellule sur la même ligne qu'un 1 (la ligne est non nulle) et sur la même diagonale qu'un 1 doit contenir elle-même un 1. On peut donc envisager de transmettre des signaux sur les lignes et les diagonales pour détecter la présence de 1 avec des règles purement locales. 
+Dans le cadre du problème de la factorisation, les problèmes liés à la propagation de contraintes peuvent se traduire de manière assez analogue aux signaux transmis par les cellules de ce modèle. En effet, les termes de l'addition binaire doivent respecter une contrainte globale : les lignes non-nulles sont toutes égales (à la translation due à la retenue près) : si on pose la multiplication binaire de $a$ par $b$, on somme des copies de $a$, décalées de $i$ crans vers la gauche pour tout $i\in I$ tel que $b = \sum_{i\in I}2^i$ (cf. Figure $9$) . Ceci peut se traduire de la façon suivante : une cellule sur la même ligne qu'un 1 (la ligne est non nulle) et sur la même diagonale qu'un 1 doit contenir elle-même un 1. On peut donc envisager de transmettre des signaux sur les lignes et les diagonales pour détecter la présence de 1 avec des règles purement locales. 
 
 \begin{figure}
 \centering
