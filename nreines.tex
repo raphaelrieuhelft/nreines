@@ -545,11 +545,8 @@ Lorsqu'elles bougent, les deux reines du triangle rouge restent dedans : à chaq
 
 \begin{figure}[scale=0.85]
 \centering
-%\newchessgame
-\chessboard[maxfield=f6,
-  setpieces={qa3,qb3,qc6,qd4,qe1,qf5},pgf=true,captrimtoprint=true,psset=true, psskak=true,
-color=red!50,
-colorbackfields={a2,a3,b3}]
+
+\includegraphics{fig7_scissored.pdf}
 
 %\chessboard[maxfield=f6, setpieces={qa3,qb3,qc6,qd4,qe1,qf5}]
 \caption{Exemple de position insoluble avec $\eta=0$.}
@@ -557,7 +554,7 @@ colorbackfields={a2,a3,b3}]
 
 \medskip
 
-On veut donc que le choix de la destination ne soit pas toujours la case adhacente qui minimise $\omega$. On se donne donc une probabilité $\eta \in [0,1]$, et on choisit avec une probabilité $\eta$ une case aléatoire de $V_c$ comme destination, et avec une probabilité $1 - \eta$ une case aléatoire parmi les éléments de $V_c$ qui minimisent $\omega$. Ainsi, la position de la figure $7$ ne pose pas de problème pour $\eta > 0$ : une reine va sortir du triangle rouge et faire se déplacer une des autres reines.
+On veut donc que le choix de la destination ne soit pas toujours la case adhacente qui minimise $\omega$. On se donne donc une probabilité $\eta \in [0,1]$, et on choisit avec une probabilité $\eta$ une case aléatoire de $V_c$ comme destination, et avec une probabilité $1 - \eta$ une case aléatoire parmi les éléments de $V_c$ qui minimisent $\omega$. Ainsi, la position de la figure $7$ ne pose pas de problème pour $\eta > 0$ : une reine va finir par sortir du triangle rouge et une des autres reines se déplacera par la suite.
 
 Une fois la destination choisie, la procédure qui décide si le déplacement se fait ou non est exactement la fonction $\M$ de l'algorithme précédent.
 
