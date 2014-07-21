@@ -77,7 +77,7 @@ On va chercher, en partant d'une situation initiale quelconque, à déplacer les
 
 On cherche à se donner une procédure de mise à jour locale telle qu'à chaque pas de temps, les états de certaines cases sont modifiés à partir d'informations sur les cases voisines : création et transmission de signaux, déplacements de reines... L'objectif est que les signaux traduisent au mieux la présence ou l'absence de reines dans la direction d'où ils viennent, et que les reines menacées se déplacent au cours du temps pour chercher des cases sûres. On cherche également à ce que les reines ne bougent plus une fois qu'une solution est atteinte. 
 
-On s'astreint à ne déplacer les reines que d'au plus une case par pas de temps, de sorte que la règle de mise à jour puisse rester purement locale. On voudrait ne déplacer les reines que sur des cases sûres, mais c'est trop restrictif : il existe des positions qui ne sont pas solution du problème mais où toutes les reines sont entourées de cases menacées (cf. Figure 1). En revanche, permettre aux reines de se déplacer sur des cases dangereuses sans utiliser les informations locales dont elles disposent donne des mouvements trop aléatoires pour qu'on puisse espérer atteindre une solution en un temps raisonnable. On fixe donc une probabilité $\varepsilon \in [0,1]$, qui correspond à la probabilité pour une reine qui envisage un déplacement vers une case dangereuse de l'effectuer (alors qu'un déplacement vers une case sûre réussit toujours). En fixant $\varepsilon$ assez petit (de l'ordre de $0.01$ par exemple), on privilégie les déplacements vers des cases sûres tout en se donnant quand même la possibilité de sortir de situations bloquées.
+On s'astreint à ne déplacer les reines que d'au plus une case par pas de temps, de sorte que la règle de mise à jour puisse rester purement locale. On voudrait ne déplacer les reines que sur des cases sûres, mais c'est trop restrictif : il existe des positions qui ne sont pas solution du problème mais où toutes les reines sont entourées de cases menacées (cf. Figure 1). En revanche, permettre aux reines de se déplacer sur des cases dangereuses sans utiliser les informations locales dont elles disposent donne des mouvements trop aléatoires pour qu'on puisse espérer atteindre une solution en un temps raisonnable. On fixe donc une probabilité $\varepsilon \in [0,1]$, qui correspond à la probabilité pour une reine qui envisage un déplacement vers une case dangereuse de l'effectuer, alors qu'un déplacement vers une case sûre est systématique. En fixant $\varepsilon$ assez petit (de l'ordre de $0.01$ par exemple), on privilégie les déplacements vers des cases sûres tout en se donnant quand même la possibilité de sortir de situations bloquées.
 
 
 \begin{figure}
@@ -96,13 +96,10 @@ On s'astreint à ne déplacer les reines que d'au plus une case par pas de temps
 \subsection*{Représentation du système}
 
 \noindent
-On représente l'échiquier par l'ensemble $\La = \cg 0, n-1\cd^2$. On pose $\mathcal{P} = \{0,1\}$ et $\D = \{NW,N,NE,W,E,SW,S,SE\}$ l'ensemble des huit directions. L'état d'une cellule étant déterminé par le nombre de reines présentes et la présence ou l'absence d'un signal en provenance de chaque direction, on note $\mathcal{Q} = {\mathcal{P}^8}\times\N$ l'ensemble des états. Une \emph{configuration} est un élément de $\E=\mathcal{Q}^\La$. Pour toute configuration $x$, et toute cellule $c \in \La$, on note $x_c = (s_{x, c}, n_{x, c})$ l'état de la cellule $c$ dans la configuration $x$. 
-
-\noindent
-$n_{x,c}$ est le nombre de reines sur la cellule $c$ dans la configuration $x$, et $s_{x,c} = (s_{x,c,N}, s_{x,c,NE}, s_{x,c,E}, \ldots, s_{x,c,NW})$ code la présence ou l'absence de signaux venant de chaque direction : $s_{x,c,d}$ vaut $1$ si dans la configuration $x$, la cellule $c$ contient un signal provenant de la direction $d$, et $0$ sinon.
+On représente l'échiquier par l'ensemble $\La = \cg 0, n-1\cd^2$. On pose $\mathcal{P} = \{0,1\}$ et $\D = \{NW,N,NE,W,E,SW,S,SE\}$ l'ensemble des huit directions. L'état d'une cellule étant déterminé par le nombre de reines présentes et la présence ou l'absence d'un signal en provenance de chaque direction, on note $\mathcal{Q} = {\mathcal{P}^8}\times\N$ l'ensemble des états. Une \emph{configuration} est un élément de $\E=\mathcal{Q}^\La$. Pour toute configuration $x$, et toute cellule $c \in \La$, on note $x_c = (s_{x, c}, n_{x, c})$ l'état de la cellule $c$ dans la configuration $x$, où $n_{x,c}$ est le nombre de reines sur la cellule $c$ dans la configuration $x$, et $s_{x,c} = (s_{x,c,N}, s_{x,c,NE}, s_{x,c,E}, \ldots, s_{x,c,NW})$ code la présence ou l'absence de signaux venant de chaque direction : $s_{x,c,d}$ vaut $1$ si dans la configuration $x$, la cellule $c$ contient un signal provenant de la direction $d$, et $0$ sinon.
 
 
-Par souci de lisibilité, on omettra les indices $x$ de configuration partout où on pourra le faire sans ambiguïté et on parlera de l'état $(s_c, n_c)$ d'une cellule $c$.
+Par souci de lisibilité, on omettra les indices $x$ de configuration partout où on pourra le faire sans ambiguïté et on parlera de l'état $(s_c, n_c)$ d'une cellule~$c$.
 %La fonction $s_{x, c}$ associe à chaque direction $1$ si $c$ contient un signal en provenance de cette direction et $0$ sinon, et $c$ contient $n_{x, c}$ reines.
 
 On pose $\Ne \subset \La^2$ l'ensemble des paires de cellules adjacentes : $$(c, c') \in \Ne \iff \norm{(c-c')}_\infty = 1$$
@@ -110,7 +107,7 @@ On pose $\Ne \subset \La^2$ l'ensemble des paires de cellules adjacentes : $$(c,
 À chaque pas de temps, on choisit au hasard une paire de cases adjacentes et on les met à jour l'une par rapport à l'autre.
 On se donne donc $(u_t)_{t\in\N} \in \Ne^\N$ la suite des paires de cellules mises à jour : pour tout $t\in\N$, la paire de cellules mises à jour à l'étape $t$ est $u_t$. Ce sont les valeurs d'une suite de variables aléatoires indépendantes à distribution uniforme sur $\Ne$. On définit de même $(x_t)_{t\in\N}$ la suite des configurations prises par le système au cours du temps. Initialement, aucun signal n'est présent et les $n$ reines sont réparties aléatoirement sur l'échiquier, selon une loi uniforme (de façon indépendante : notamment plusieurs reines peuvent se trouver initialement sur la même case). 
 
-On cherche à définir une fonction de mise à jour globale $\mathcal{F} : {\E\times\Ne}\to\E$ qui à une configuration associe une configuration aléatoire qui lui succède selon la procédure de la partie précédente : $\mathcal{F}(x_t, u_t) = x_{t+1}$.
+On cherche à définir une fonction de mise à jour globale $\mathcal{F} : {\E\times\Ne}\to\E$ qui à une configuration associe une configuration qui lui succède selon la procédure de la partie précédente : $\mathcal{F}(x_t, u_t) = x_{t+1}$.
 
 %Initialement, aucun signal n'est présent.
 % et les $n$ reines sont réparties aléatoirement sur l'échiquier, selon une loi uniforme (de façon indépendante : notamment plusieurs reines peuvent se trouver initialement sur la même case). 
@@ -121,9 +118,9 @@ On souhaite choisir une paire de cases adjacentes à mettre à jour, avec la mê
 
 \item{On choisit selon une loi uniforme $N \in \cg 0, (4n-2)(n-1) -1 \cd$, on en déduit $A \in \cg 0, 4n-3 \cd$ et $B \in \cg 0, n-2\cd$ le quotient et le reste de la division euclidienne de $N$ par $(n-1)$.  }
 \item{Si $A<n$, on prend les cases $(B,A)$ et $(B+1,A)$.}
-\item{Si $A = n+i, i<n$ on prend les cases $(i,B)$ et $(i,B+1)$.}
-\item{Si $A = 2n+i,i<n-1$ on prend $(i,B)$ et $(i+1, B+1)$.}
-\item{Sinon, $A = 3n-1+i$ et $i<n-1$, et on prend $(i, B+1)$ et $(i+1, B)$.}
+\item{Si $A = n+i, 0\leq i<n$, on prend les cases $(i,B)$ et $(i,B+1)$.}
+\item{Si $A = 2n+i,0 \leq i<n-1$, on prend $(i,B)$ et $(i+1, B+1)$.}
+\item{Sinon, $A = 3n-1+i$ et $0 \leq i<n-1$, et on prend $(i, B+1)$ et $(i+1, B)$.}
 %\item{On choisit selon une loi uniforme une direction (parmi N, NW, NE, W, E, SW, SE, S)}.
 
 %\item{On choisit selon une loi uniforme une case possédant une case voisine dans cette direction (c'est-à-dire ne se trouvant pas sur le mauvais bord de l'échiquier).}
@@ -142,13 +139,61 @@ On se donne deux cases adjacentes $c$ et $c'$ à mettre à jour. On commence par
 
 \item{ Si une reine est présente en case $c$, alors que la case $c$ contient un signal, elle essaie de se déplacer vers la case $c'$. De même, si plusieurs reines sont présentes en $c$, elles sont menacées et l'une d'entre elles tente de se déplacer vers la case $c'$.}
 
-\item{ S'il n'y a pas de signal en $c'$ sauf éventuellement un venant de $c$ (qui est peut-être dû à la présence de la reine qui cherche à bouger), et qu'il n'y a pas d'autre reine en $c'$, la case est considérée comme sûre et le déplacement a lieu (cf. Figure $2$). Sinon, la case est dangereuse, et le déplacement a lieu seulement avec une probabilité $\varepsilon$.
+\item{ S'il n'y a pas de signal en $c'$ sauf éventuellement un venant de $c$ (qui est peut-être dû à la présence de la reine qui cherche à bouger), et qu'il n'y a pas d'autre reine en $c'$, la case est considérée comme sûre et le déplacement a lieu (cf. Figure \ref{fig:deplacement}). Sinon, la case est dangereuse, et le déplacement a lieu seulement avec une probabilité $\varepsilon$.
 % Si le déplacement réussit, on retire une reine à la case $c$ et on en ajoute une à la case $(i', j')$. 
 }
 
 \item{ Symétriquement, une reine de $c'$ peut se déplacer vers $c$ selon la même procédure. Les deux déplacements se font de manière simultanée afin que l'ordre des deux cases choisies pour la mise à jour n'ait pas d'importance.}
 
 \end{itemize}
+
+\definecolor{ffqqqq}{rgb}{1,0,0}
+\definecolor{xdxdff}{rgb}{0.49,0.49,1}
+\definecolor{zzttqq}{rgb}{0.6,0.2,0}
+\definecolor{uququq}{rgb}{0.25,0.25,0.25}
+\definecolor{qqqqff}{rgb}{0,0,1}
+
+\begin{figure}[bt]
+\centering
+\begin{tikzpicture}[line cap=round,line join=round,>=triangle 45,x=1.0cm,y=1.0cm]
+\clip(-8.56,-0.74) rectangle (4.7,2.48);
+%\fill[color=zzttqq,fill=zzttqq,fill opacity=0.1] (0,2) -- (0,0) -- (2,0) -- (2,2) -- cycle;
+%\fill[color=zzttqq,fill=zzttqq,fill opacity=0.1] (2,2) -- (2,0) -- (4,0) -- (4,2) -- cycle;
+%\fill[color=zzttqq,fill=zzttqq,fill opacity=0.1] (-7.7,2) -- (-7.7,0) -- (-5.7,0) -- (-5.7,2) -- cycle;
+%\fill[color=zzttqq,fill=zzttqq,fill opacity=0.1] (-5.7,2) -- (-5.7,0) -- (-3.7,0) -- (-3.7,2) -- cycle;
+\draw [color=zzttqq] (0,2)-- (0,0);
+\draw [color=zzttqq] (0,0)-- (2,0);
+\draw [color=zzttqq] (2,0)-- (2,2);
+\draw [color=zzttqq] (2,2)-- (0,2);
+\draw [color=zzttqq] (2,2)-- (2,0);
+\draw [color=zzttqq] (2,0)-- (4,0);
+\draw [color=zzttqq] (4,0)-- (4,2);
+\draw [color=zzttqq] (4,2)-- (2,2);
+\draw [->] (2,1) -- (1.5,1);
+\draw (1.02,-0.14) node[anchor=north west] {1};
+\draw (2.94,-0.14) node[anchor=north west] {2};
+\draw [color=zzttqq] (-7.7,2)-- (-7.7,0);
+\draw [color=zzttqq] (-7.7,0)-- (-5.7,0);
+\draw [color=zzttqq] (-5.7,0)-- (-5.7,2);
+\draw [color=zzttqq] (-5.7,2)-- (-7.7,2);
+\draw [color=zzttqq] (-5.7,2)-- (-5.7,0);
+\draw [color=zzttqq] (-5.7,0)-- (-3.7,0);
+\draw [color=zzttqq] (-3.7,0)-- (-3.7,2);
+\draw [color=zzttqq] (-3.7,2)-- (-5.7,2);
+\draw [->,dash pattern=on 1pt off 1pt] (-3.1,0.98) -- (-0.58,1);
+\draw (-6.94,-0.22) node[anchor=north west] {1};
+\draw (-4.66,-0.2) node[anchor=north west] {2};
+\draw [->] (-6.7,2) -- (-6.7,1.5);
+\draw [->] (1,2) -- (1,1.5);
+\draw [fill=black,pattern=north east lines] (-6.74,0.96) circle (0.29cm);
+\draw [fill=black,pattern=north east lines] (3.04,1.02) circle (0.29cm);
+\end{tikzpicture}
+%\includegraphics[scale=1.2]{schema2.png}
+\caption{La reine présente en 1, menacée depuis le nord, se déplace en 2 qui est une case sûre, puis les signaux sont mis à jour : il y a une reine en 2, donc un signal venant de l'est apparaît en 1.}
+\label{fig:deplacement}
+\end{figure}
+
+
 \medskip
 Formalisons cette procédure à l'aide de quelques fonctions auxiliaires :  
 
@@ -231,86 +276,7 @@ Un signal en $c'$ provenant de la direction de $c$ apparaît ou reste présent s
 
 \end{itemize}
 
-\bigskip
-
-\noindent 
-Formellement, on pose, pour tout %$x\in\E$, $(c,c')\in\Ne$, 
-$d\in\D$, le signal mis à jour $s_{x, c, d}^{c'}$ :  \[
-s_{x, c, d}^{c'} = 
-\begin{cases}
-  \hfill s_{x, c, d} \hfill & \text{ si $d \neq \delta(c', c)$} \\
-  \hfill 1 \hfill & \text{ si $d = \delta(c', c)$ et $n_{x, c'}\geq 1$} \\
-  \hfill s_{x, c', d} \hfill & \text{ sinon}\\
-\end{cases}
-\]
-
-$s_{x, c, d}^{c'}$ est le signal de la case $c$ se rapportant à la direction $d$, et mis à jour par rapport à la case $c'$. On va s'en servir pour définir une fonction $\mathcal{F}_{\mathrm{sign}} : \E\times\Ne\to\E$ de mise à jour des signaux :
-\noindent
- $\mathcal{F}_{\mathrm{sign}} (x, (c_1, c_2)) = x'$ avec : \[
-\begin{cases}
-  \hfill x'_{c_1} = (s_{x, c_1}^{c_2}, n_{x,c_1}) \hfill & \\
-  \hfill x'_{c_2} = (s_{x, c_2}^{c_1}, n_{x, c_2}) \hfill & \\
-  \hfill x'_c = x_c  \hfill & \text{pour tout $c \notin \{ c_1, c_2\}$} \\
-\end{cases}
-\]
-
-\bigskip
-
-\noindent
-On peut alors définir la fonction de mise à jour : $$\mathcal{F}(x_t, u_t) = \mathcal{F}_{\mathrm{sign}}(\mathcal{F}_{\mathrm{move}}(x_t, u_t), u_t)$$
-
-
-On remarque que lors de la mise à jour d'une case, la nouvelle valeur du signal qu'on modifie ne dépend pas de l'ancienne valeur, mais seulement de la case voisine : les signaux sont transmis localement de manière instantanée mais les cases n'ont pas de mémoire. Ainsi, lorsqu'une reine quitte une rangée de cases, les signaux dans cette direction n'arrivent plus et l'information de l'absence de cette reine est propagée. 
-
-L'asynchronisme de la mise à jour est utile : si on mettait les cases à jour de façon synchrone, deux reines sur la même ligne, colonne ou diagonale recevraient en même temps l'information, et pourraient se déplacer toutes les deux en même temps alors que le comportement souhaité est qu'une seule des deux reines se déplace. 
-
-
- \definecolor{ffqqqq}{rgb}{1,0,0}
-\definecolor{xdxdff}{rgb}{0.49,0.49,1}
-\definecolor{zzttqq}{rgb}{0.6,0.2,0}
-\definecolor{uququq}{rgb}{0.25,0.25,0.25}
-\definecolor{qqqqff}{rgb}{0,0,1}
-
-
-\begin{figure}[p]
-\centering
-\begin{tikzpicture}[line cap=round,line join=round,>=triangle 45,x=1.0cm,y=1.0cm]
-\clip(-8.56,-0.74) rectangle (4.7,2.48);
-%\fill[color=zzttqq,fill=zzttqq,fill opacity=0.1] (0,2) -- (0,0) -- (2,0) -- (2,2) -- cycle;
-%\fill[color=zzttqq,fill=zzttqq,fill opacity=0.1] (2,2) -- (2,0) -- (4,0) -- (4,2) -- cycle;
-%\fill[color=zzttqq,fill=zzttqq,fill opacity=0.1] (-7.7,2) -- (-7.7,0) -- (-5.7,0) -- (-5.7,2) -- cycle;
-%\fill[color=zzttqq,fill=zzttqq,fill opacity=0.1] (-5.7,2) -- (-5.7,0) -- (-3.7,0) -- (-3.7,2) -- cycle;
-\draw [color=zzttqq] (0,2)-- (0,0);
-\draw [color=zzttqq] (0,0)-- (2,0);
-\draw [color=zzttqq] (2,0)-- (2,2);
-\draw [color=zzttqq] (2,2)-- (0,2);
-\draw [color=zzttqq] (2,2)-- (2,0);
-\draw [color=zzttqq] (2,0)-- (4,0);
-\draw [color=zzttqq] (4,0)-- (4,2);
-\draw [color=zzttqq] (4,2)-- (2,2);
-\draw [->] (2,1) -- (1.5,1);
-\draw (1.02,-0.14) node[anchor=north west] {1};
-\draw (2.94,-0.14) node[anchor=north west] {2};
-\draw [color=zzttqq] (-7.7,2)-- (-7.7,0);
-\draw [color=zzttqq] (-7.7,0)-- (-5.7,0);
-\draw [color=zzttqq] (-5.7,0)-- (-5.7,2);
-\draw [color=zzttqq] (-5.7,2)-- (-7.7,2);
-\draw [color=zzttqq] (-5.7,2)-- (-5.7,0);
-\draw [color=zzttqq] (-5.7,0)-- (-3.7,0);
-\draw [color=zzttqq] (-3.7,0)-- (-3.7,2);
-\draw [color=zzttqq] (-3.7,2)-- (-5.7,2);
-\draw [->,dash pattern=on 1pt off 1pt] (-3.1,0.98) -- (-0.58,1);
-\draw (-6.94,-0.22) node[anchor=north west] {1};
-\draw (-4.66,-0.2) node[anchor=north west] {2};
-\draw [->] (-6.7,2) -- (-6.7,1.5);
-\draw [->] (1,2) -- (1,1.5);
-\draw [fill=black,pattern=north east lines] (-6.74,0.96) circle (0.29cm);
-\draw [fill=black,pattern=north east lines] (3.04,1.02) circle (0.29cm);
-\end{tikzpicture}
-%\includegraphics[scale=1.2]{schema2.png}
-\caption{La reine présente en 1, menacée depuis le nord, se déplace en 2 qui est une case sûre, puis les signaux sont mis à jour : il y a une reine en 2, donc un signal venant de l'est apparaît en 1.}
-\end{figure}
-\begin{figure}[p]
+\begin{figure}[hbt]
 \centering
 \begin{tikzpicture}[line cap=round,line join=round,>=triangle 45,x=1.0cm,y=1.0cm]
 \clip(-8.56,-0.74) rectangle (4.7,2.48);
@@ -349,7 +315,7 @@ L'asynchronisme de la mise à jour est utile : si on mettait les cases à jour d
 \caption { Le signal de la cellule 1 venant de l'ouest est transmis à la cellule 2.}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[hbt]
 \centering
 \definecolor{zzttqq}{rgb}{0.6,0.2,0}
 \begin{tikzpicture}[line cap=round,line join=round,>=triangle 45,x=1.0cm,y=1.0cm]
@@ -382,12 +348,50 @@ L'asynchronisme de la mise à jour est utile : si on mettait les cases à jour d
 \caption{Le signal en 1 venant de l'est disparaît.}
 \end{figure}
 
+\bigskip
+
+\noindent 
+Formellement, on pose, pour tout %$x\in\E$, $(c,c')\in\Ne$, 
+$d\in\D$,  $s_{x, c, d}^{c'}$ le signal de la case $c$ se rapportant à la direction $d$, mis à jour par rapport à $c'$ selon la règle :  \[
+s_{x, c, d}^{c'} = 
+\begin{cases}
+  \hfill s_{x, c, d} \hfill & \text{ si $d \neq \delta(c', c)$} \\
+  \hfill 1 \hfill & \text{ si $d = \delta(c', c)$ et $n_{x, c'}\geq 1$} \\
+  \hfill s_{x, c', d} \hfill & \text{ sinon}\\
+\end{cases}
+\]
+
+On va s'en servir pour définir une fonction $\mathcal{F}_{\mathrm{sign}} : \E\times\Ne\to\E$ de mise à jour des signaux :
+\noindent
+ $\mathcal{F}_{\mathrm{sign}} (x, (c_1, c_2)) = x'$ avec : \[
+\begin{cases}
+  \hfill x'_{c_1} = (s_{x, c_1}^{c_2}, n_{x,c_1}) \hfill & \\
+  \hfill x'_{c_2} = (s_{x, c_2}^{c_1}, n_{x, c_2}) \hfill & \\
+  \hfill x'_c = x_c  \hfill & \text{pour tout $c \notin \{ c_1, c_2\}$} \\
+\end{cases}
+\]
+
+\bigskip
+
+\noindent
+On peut alors définir la fonction de mise à jour : $$\mathcal{F}(x_t, u_t) = \mathcal{F}_{\mathrm{sign}}(\mathcal{F}_{\mathrm{move}}(x_t, u_t), u_t)$$
+
+
+On remarque que lors de la mise à jour d'une case, la nouvelle valeur du signal qu'on modifie ne dépend pas de l'ancienne valeur, mais seulement de la case voisine : les signaux sont transmis localement de manière instantanée mais les cases n'ont pas de mémoire. Ainsi, lorsqu'une reine quitte une rangée de cases, les signaux dans cette direction n'arrivent plus et l'information de l'absence de cette reine est propagée. 
+
+L'asynchronisme de la mise à jour est utile : si on mettait les cases à jour de façon synchrone, deux reines sur la même ligne, colonne ou diagonale recevraient en même temps l'information, et pourraient se déplacer toutes les deux en même temps alors que le comportement souhaité est qu'une seule des deux reines se déplace. 
+
+
+
+
+
+
 \clearpage
 
 
 
 
-\section*{Quelques observations expérimentales}
+\section*{Expérimentations}
 
 
 Lancé à partir d'une situation de départ aléatoire (la case de départ de chacune des $n$ reines est choisie selon une loi uniforme de façon indépendante), on observe que le système finit par atteindre un point fixe où chaque reine est sur une case sans signal. La position des reines est alors solution du problème des $n$ reines.
@@ -400,9 +404,9 @@ On observe en général un régime transitoire sur les premiers milliers de pas 
 
 
 
-Le paramètre $\varepsilon$ a des effets multiples. Plus $\varepsilon$ est grand, plus le système sort rapidement de situations bloquées où aucun déplacement vers une case sûre n'est possible. En revanche, plus il est petit, plus le système a tendance à effectuer tous les déplacements possibles vers des cases sûres avant de déplacer une reine vers une case dangereuse, ce qui peut empêcher de passer à côté d'une solution. En effet, si une solution est accessible sans avoir besoin de déplacer de reine vers une case dangereuse, plus $\varepsilon$ est grand, plus le risque de déplacer une reine vers une case dangereuse et d'avoir peu de chances de trouver rapidement cette solution est important. Enfin, comme il y a typiquement très peu de cases sûres, $\varepsilon$ contrôle également la fréquence des déplacements : plus il est petit, plus les signaux ont de temps pour se propager sur l'échiquier avant le prochain déplacement de reine. Ceci implique que plus $\varepsilon$ est petit, plus les reines se déplacent en se basant sur des informations à jour. 
+Le paramètre $\varepsilon$ a des effets multiples. Plus $\varepsilon$ est grand, plus le système sort rapidement de situations bloquées où aucun déplacement vers une case sûre n'est possible. En revanche, plus il est petit, plus le système a tendance à effectuer tous les déplacements possibles vers des cases sûres avant de déplacer une reine vers une case dangereuse, ce qui peut empêcher de passer à côté d'une solution. En effet, si une solution est accessible sans avoir besoin de déplacer de reine vers une case dangereuse, plus $\varepsilon$ est grand, plus le risque de déplacer une reine vers une case dangereuse et d'avoir peu de chances de trouver rapidement cette solution est important. Enfin, comme il y a typiquement très peu de cases sûres, $\varepsilon$ contrôle également la fréquence des déplacements : plus il est petit, plus les signaux ont de temps pour se propager sur l'échiquier avant le prochain déplacement de reine. Ceci implique que plus $\varepsilon$ est petit, plus les reines se déplacent en se basant sur des informations à jour. Indirectement, $\varepsilon$ contrôle donc également le degré d'asynchronisme à retards du système. 
 
-Le choix de $\varepsilon$ pour minimiser le temps mis par le système pour trouver une solution relève donc d'un compromis entre ces différents effets : on le voudrait petit pour privilégier les déplacements sûrs et déplacer les reines à partir d'informations valides, mais grand pour que les déplacements soient suffisament fréquents.
+Le choix de $\varepsilon$ pour minimiser le temps mis par le système pour trouver une solution relève donc d'un compromis entre ces différents effets : on le voudrait petit pour privilégier les déplacements sûrs et déplacer les reines à partir d'informations valides, mais grand pour que les déplacements soient suffisamment fréquents.
 
 La figure $5$ représente la variation du temps de convergence (le nombre de mises à jour avant d'atteindre une solution) et du nombre de déplacements effectifs de reine en fonction de la probabilité $\varepsilon$, dans le cas $n=8$. Les valeurs sont des moyennes sur $100$ échantillons, sauf les deux points extrémaux où l'on s'est restreint à $30$ échantillons pour des raisons de temps de calcul. On observe un optimum de $\varepsilon$ pour ce qui est du temps de convergence, autour de $0.01$, tandis que le nombre de déplacements croît avec $\varepsilon$ sur les valeurs considérées. 
 
@@ -538,7 +542,7 @@ On définit $\omega : \La\to\N\cup\{\infty\}$ qui sert à quantifier à quel poi
 \]
 
 On aimerait toujours envoyer une reine menacée de $c$ vers une cellule de $V_c$ qui minimise $\omega$, mais il existe des positions pour lesquelles un tel choix déterministe ne permet pas de résoudre le problème. Ainsi, la position de la figure $7$, avec les signaux convenablement propagés (ie. une case porte un signal venant d'une certaine direction si et seulement si il y a effectivement une reine dans cette direction), est une position insoluble. En effet, en partant de cette position, on aura à chaque instant les reines des colonnes \textbf c à \textbf f sur leur case initiale, et les deux autres dans le triangle de cases colorées en rouge, ce qui ne peut constituer une solution. 
-Lorsqu'elles bougent, les deux reines du triangle rouge restent dedans : à chaque instant, la case rouge inoccupée vérifie $\omega = 2$, contre $3$ ou $4$ pour les cases adjacentes au triangle rouge. Quelque soit la position des deux reines dans le triangle rouge, les autres reines ne sont pas menacées : à chaque instant, le prochain mouvement est donc celui d'une des deux reines du triangle rouge, et elle reste dans ce triangle.
+Lorsqu'elles bougent, les deux reines du triangle rouge restent dedans : à chaque instant, la case rouge inoccupée vérifie $\omega = 2$, contre $3$ ou $4$ pour les cases adjacentes au triangle rouge. Quelle que soit la position des deux reines dans le triangle rouge, les autres reines ne sont pas menacées : à chaque instant, le prochain mouvement est donc celui d'une des deux reines du triangle rouge, et elle reste dans ce triangle.
 
 
 % TODO : figure
@@ -554,7 +558,7 @@ Lorsqu'elles bougent, les deux reines du triangle rouge restent dedans : à chaq
 
 \medskip
 
-On veut donc que le choix de la destination ne soit pas toujours la case adhacente qui minimise $\omega$. On se donne donc une probabilité $\eta \in [0,1]$, et on choisit avec une probabilité $\eta$ une case aléatoire de $V_c$ comme destination, et avec une probabilité $1 - \eta$ une case aléatoire parmi les éléments de $V_c$ qui minimisent $\omega$. Ainsi, la position de la figure $7$ ne pose pas de problème pour $\eta > 0$ : une reine va finir par sortir du triangle rouge et une des autres reines se déplacera par la suite.
+On veut donc que le choix de la destination ne soit pas toujours la case adjacente qui minimise $\omega$. On se donne donc une probabilité $\eta \in [0,1]$, et on choisit avec une probabilité $\eta$ une case aléatoire de $V_c$ comme destination, et avec une probabilité $1 - \eta$ une case aléatoire parmi les éléments de $V_c$ qui minimisent $\omega$. Ainsi, la position de la figure $7$ ne pose pas de problème pour $\eta > 0$ : une reine va finir par sortir du triangle rouge et une des autres reines se déplacera par la suite.
 
 Une fois la destination choisie, la procédure qui décide si le déplacement se fait ou non est exactement la fonction $\M$ de l'algorithme précédent.
 
@@ -589,13 +593,14 @@ Une fois la destination choisie, la procédure qui décide si le déplacement se
   \caption{Temps de convergence moyen en fonction de $n$.}
 \end{figure}  
 
-La figure $8$ montre que ce nouvel algorithme passe un peu mieux à l'échelle que précédemment : la pente de la courbe qui représente le temps de convergence moyen en fonction de $n$ est plus basse pour le nouvel algorithme que pour l'ancien. De fait, il permet de trouver en un temps raisonnable (quelques minutes sur une machine individuelle) des solutions jusqu'à $n=16$, contre $12$ pour le modèle précédent, alors que les temps de calcul sont très similaires pour $n=8$.
+La figure $8$ montre que ce nouvel algorithme passe un peu mieux à l'échelle que précédemment : la pente de la courbe qui représente le temps de convergence moyen en fonction de $n$ est plus faible pour le nouvel algorithme que pour l'ancien. De fait, il permet de trouver en un temps raisonnable (quelques minutes sur une machine individuelle) des solutions jusqu'à $n=16$, contre $12$ pour le modèle précédent, alors que les temps de calcul sont très similaires pour $n=8$. Ceci peut s'expliquer par le fait que les mouvements sont plus dirigés que dans le premier algorithme, car on utilise plus d'informations à chaque coup et on s'efforce de choisir des directions intéressantes pour déplacer les reines.
+
 
 \clearpage
 
 \section*{Lien avec la factorisation}
 
-Dans le cadre du problème de la factorisation, les problèmes liés à la propagation de contraintes peuvent se traduire de manière assez analogue aux signaux transmis par les cellules de ce modèle. En effet, les termes de l'addition binaire doivent respecter une contrainte globale : les lignes non-nulles sont toutes égales (à la translation due à la retenue près) : si on pose la multiplication binaire de $a$ par $b$, on somme des copies de $a$, décalées de $i$ crans vers la gauche pour tout $i\in I$ tel que $b = \sum_{i\in I}2^i$ (cf. Figure $9$) . Ceci peut se traduire de la façon suivante : une cellule sur la même ligne qu'un 1 (la ligne est non nulle) et sur la même diagonale qu'un 1 doit contenir elle-même un 1. On peut donc envisager de transmettre des signaux sur les lignes et les diagonales pour détecter la présence de 1 avec des règles purement locales. 
+Dans le cadre du problème de la factorisation, les problèmes liés à la propagation de contraintes peuvent se traduire de manière assez analogue aux signaux transmis par les cellules de ce modèle. En effet, les termes de l'addition binaire doivent respecter une contrainte globale : les lignes non-nulles sont toutes égales (à la translation due à la retenue près) : si on pose la multiplication binaire de $a$ par $b$, on somme des copies de $a$, décalées de $i$ crans vers la gauche pour tout $i\in I$, avec $I$ tel que $b = \sum_{i\in I}2^i$ (cf. Figure $9$) . Ceci peut se traduire de la façon suivante : une cellule sur la même ligne qu'un 1 (la ligne est non nulle) et sur la même diagonale qu'un 1 doit contenir elle-même un 1. On peut donc envisager de transmettre des signaux sur les lignes et les diagonales pour détecter la présence de 1 avec des règles purement locales. 
 
 \begin{figure}
 \centering
